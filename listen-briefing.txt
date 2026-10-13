@@ -1,0 +1,232 @@
+AI Collusion Research Sprint. A listening briefing.
+
+This briefing covers two things. First, what the hackathon is and what resources the organizers have given us. Second, the ten project ideas we came up with, in detail, ending with a recommendation and a weekend plan. It should take about fifteen minutes to listen to.
+
+
+Part one. The event.
+
+The event is the AI Collusion Research Sprint, run by Apart Research. It runs from Friday the twenty-third to Sunday the twenty-fifth of October, twenty twenty-six. It is co-organized with Poseidon Research and AE Studio, with support from Modal and the AI Alignment Foundation.
+
+You can take part online from anywhere, or at an in-person hub. The main hub is at Collider in New York City, open Saturday and Sunday. There is also a hub in Hong Kong, and local sites in Montreal, Atlanta at Georgia Tech, Cape Town, the University of Warwick in central England, Groningen in the Netherlands, and Toronto. Teams that work from an in-person hub get two hundred and fifty dollars of Modal compute credit per team.
+
+Teams can have one to five people, so a team of two is fine. No AI safety background is required, and the organizers specifically invite people from quantitative finance, because much of the material is about markets and pricing.
+
+The format is simple. You pick one open research question, build an experiment, and write up the results. The deadline is Sunday the twenty-fifth at eleven fifty-nine PM, Anywhere on Earth time. That is the latest time zone on the planet, so in practice it is Monday morning in Europe.
+
+One small oddity: when we looked at the sprint page, it said the submission window had closed, even though the event hadn't started yet. That is probably a glitch in the page template, but it is worth checking that registration is open.
+
+
+What the sprint is about.
+
+The theme is collusion between AI agents. Collusion here means AI agents coordinating in ways that hurt someone else, typically customers, or the people overseeing the agents. The classic example is pricing. Earlier research has shown that when language model agents are each told to set prices for competing sellers, they can drift into keeping prices above the competitive level, without anyone telling them to. That is the AI version of a price-fixing cartel. Other research has shown agents engaging in anti-competitive practices, such as splitting up markets. It has also shown agents forming coalitions inside a shared workplace task that benefit their group at the expense of the overall goal.
+
+The sprint asks three broad questions. When does collusion emerge? What should count as evidence that it happened? And how is coordination carried between agents, and how can it be broken?
+
+
+Prizes and judging.
+
+Two thousand dollars in total. First place gets one thousand dollars, second gets five hundred, third gets three hundred, and fourth and fifth get one hundred each. Top teams also get a fast track into the Apart Fellowship, though a place is not guaranteed, plus introductions to mentors and a path toward a publishable paper.
+
+Judges score each project from one to five on three criteria.
+
+The first is impact potential and innovation: how important the problem is, and how new the work is. This one is crucial. To score four or five here, the work must be new. A straight replication of an existing paper cannot reach the top scores. So the winning pattern is to reuse existing code and add one genuinely new variable, condition, or measurement.
+
+The second is execution quality: whether the method is sound, the implementation correct, and the findings supported.
+
+The third is presentation and clarity: how well you explain the problem, the method, the results, and the limitations.
+
+
+What to submit.
+
+The required piece is a research report as a PDF, using the official Apart template, which is a Google Doc. A typical report is four to eight pages. It needs a title, an abstract of a hundred and fifty words or fewer, and author names and affiliations. It must include an appendix called Limitations and Dual-Use or Ethical Considerations. Dual-use means discussing how the work could be misused, for example whether a collusion technique you discovered could help someone build colluding agents on purpose.
+
+Optional extras are a public GitHub repository and a three-to-five-minute video demo.
+
+The recommended structure is: introduction, related work, methodology with enough detail for someone else to replicate, results, discussion, the limitations appendix, and references. In the results, the organizers want variance across random seeds, baselines, and a positive control. A positive control is a condition where you already expect collusion to happen. It proves your setup can detect the effect at all, so a null result elsewhere means something.
+
+Two rules to remember. First, the report must be written in your own words. The judges say they may decline to score reports that read as machine-generated. So you can use AI coding assistants for the code, but write the report yourselves. Second, if you build on work you did before the sprint, you must clearly say which parts are new. Undisclosed prior work can lead to disqualification.
+
+Submissions appear publicly within about twelve hours. Judges take about a week to review, and results are announced one to two weeks after that.
+
+
+Practical resources and budget.
+
+The organizers have made the sprint deliberately accessible. Every suggested project runs on an ordinary laptop with sixteen gigabytes of memory and no GPU. The work is mostly calling language model APIs, such as OpenAI, Google Gemini, or Mistral, and analyzing the results. Suggested API budgets range from nothing for purely scripted experiments up to about one hundred and twenty dollars. Most projects land between twenty and one hundred dollars.
+
+Their advice on experiment size: start with three to five random seeds per condition. Once your positive control works, expand to ten to twenty seeds per condition.
+
+They provide starter code from existing research. The key repositories are these.
+
+A pricing duopoly simulator, where two language model sellers set prices over repeated rounds. One version is by Lucia Sauer, the other is called LLM Cartel.
+
+A marketplace simulator where sellers can send each other messages, from the paper by Agrawal and colleagues. It is the main testbed for questions about communication and oversight.
+
+Colosseum, from UMass, a workplace-style environment where agents complete a shared task and can form coalitions.
+
+A focal points repository. It studies how models coordinate on obvious shared choices without talking, which game theorists call Schelling points.
+
+A trust-breaking repository that compares what agents announce with what they privately plan.
+
+TraceGuard, a monitoring tool, and a repository on steganographic collusion, meaning hiding coordination messages inside innocent-looking text.
+
+Finally, a repository on explicit agent alliances, and one on anti-competitive practices.
+
+
+The three tracks.
+
+Track one is Markets and Collusion. It has five questions.
+
+Question one point one: which variables are necessary for collusion to emerge? Prior work found that a mix of different, competitive agent types reduces collusion. Small, innocent-sounding cues in the prompt can increase collusive pricing. And giving pairs of agents a private channel to talk can introduce collusion.
+
+Question one point two: is collusion, once formed, robust to replacing participants? Older work with simple reinforcement learning agents found that re-matching partners breaks collusion. Newer work found that language models of different sizes still collude with each other, but a language model paired with a simple learning algorithm does not. Models from the same family coordinate better. The organizers flag an open gap: if you remove an offending agent, does its replacement recreate the collusion?
+
+Question one point three: can we improve existing detection methods? Relevant work covers correlation between deployments of the same base model, detectors that look inside the model using interpretability, and how agents pick compatible hidden signaling schemes.
+
+Question one point four: can information-theoretic methods detect collusion? A 2022 paper measured pairwise net influence, meaning how much one player's moves shift another's. It identified colluding pairs in small games. But it assumes exactly two colluders, and nobody has applied it to language model agents.
+
+Question one point five: which single restriction removes the most collusion at the least cost? Here there is a lot of prior evidence, scattered across separate papers. One honest, no-regret competitor can destabilize a cartel. Higher temperature weakens the dependence between agents. Throttling messages reduces coordination. Adding non-language-model agents collapses language model price collusion. Instructions in the system prompt cause only small, unreliable shifts. Aggressive competition instructions pushed prices below competitive levels. And in one study, removing a refundable deposit made every tested model collude in every run.
+
+Track two is Detection and Audit. It has three questions.
+
+Question two point one: which kinds of tasks lead to collusion? Known examples are pricing, anti-competitive practices, and coalition advantage in a workplace task.
+
+Question two point two: does combining what agents say with what they do beat either alone? This is a rich area. In Colosseum, the advantage a coalition actually gained through its actions was weakly anti-correlated with how collusive an AI judge rated their conversation. In other words, talk and action can point in opposite directions. Another study found over ninety percent of deviations from public announcements were already visible in private plans. Multi-dimensional monitoring lifted one monitor from zero to over seventy percent detection. But another paper found that giving a monitor more detail can make it worse.
+
+Question two point three: what should count as convincing evidence? The organizers point to antitrust law. Courts there use what are called plus factors. Parallel conduct, such as two firms raising prices at the same time, is not enough by itself to prove an agreement. You need additional evidence. The question is which signals separate a deliberate coalition from three look-alikes: innocent correlation, talk without action, and harm without any agreement.
+
+Track three is Collusion Carriers and Countermeasures. It has four questions.
+
+Question three point one: can actions, tools, or side channels carry collusion, rather than chat messages? Several papers show collusion without explicit text, and one shows steganographic tool use.
+
+Question three point two: can trusted agents disrupt collusion? The idea is an undercover agent that offers coordination opportunities and logs who takes the bait. This is completely untested.
+
+Question three point three: can agents identify their peers? Model families can be recognized from their writing style, even when anonymized. The open gap is what happens if you remove a feature from a coalition mid-run, after it has settled into a convention.
+
+Question three point four: what does a coalition do when it learns it is being watched? Telling an agent it is monitored costs the monitor more accuracy than telling the monitor gains. In one catalogue, twenty of forty attacks went uncaught by a strong monitor. But another study found concealment intent in only three of twenty-four hundred cases, and none acted on it. The closest precedent: sellers told they were monitored tried one-character messages and emojis, and failed to collude, while urgency prompts succeeded.
+
+
+Part two. Our ten project ideas.
+
+For each idea, we give the question, the setup, what to measure, and why it might score well. We also rate each one: strong, good, or risky.
+
+
+Idea one. Collusion regrowth after removing an offender. Track one point two. Rated strong, medium effort.
+
+The question: once a cartel has formed and you swap out one seller, does collusion come back? How fast, and does it depend on who the replacement is?
+
+The setup: use the LLM Cartel or duopoly code and run it until prices settle above the competitive benchmark. Then, from that same saved point, branch into five versions. In the first, no swap happens. In the second, you swap in the same model. In the third, a model from the same family. In the fourth, a model from a different provider. In the fifth, a simple learning algorithm or a no-regret agent. Cross each of those with whether the incumbent's scratchpad notes are kept or wiped.
+
+What to measure: the price level over time after the swap, and how many rounds it takes for prices to climb back above the benchmark.
+
+How to split the work: one person owns the simulation and branching, the other owns analysis and plots. Budget is twenty to one hundred dollars. This idea directly fills a gap the organizers named, which helps the innovation score.
+
+
+Idea two. A restriction leaderboard: the cheapest way to break collusion. Track one point five. Rated strong, low effort.
+
+The question: which single intervention removes the most collusion while costing the least in profit or market efficiency?
+
+The setup: use the Agrawal marketplace with fixed random seeds, changing exactly one thing at a time. The options are: no messages at all; messages capped at twenty characters; a notice that the agents are being watched; higher temperature; one non-language-model competitor; and a prompt telling agents to compete aggressively.
+
+What to measure: how much collusion drops, plotted against what each intervention costs. Then identify the Pareto frontier, the set of interventions that no other one beats on both axes.
+
+Why it scores: these interventions were each tested in a different paper on a different setup. Nobody has compared them head-to-head on one testbed, and that comparison is the new contribution.
+
+
+Idea three. Says versus does: a four-view collusion monitor. Track two point two. Rated strong, medium effort.
+
+The question: does a monitor that sees both what agents say and what they do catch collusion better than one that sees only one? And does a structured comparison of claims against outcomes beat both?
+
+The setup: take logs from Colosseum or the trust-breaking repository, mixing runs with and without collusion. Freeze one language model as the monitor, so its prompt and settings never change. Then show it four different views of the same runs: messages only, actions only, both together, and a structured report that lines up each claim with what actually happened.
+
+What to measure: detection quality using the area under the ROC curve, and the true-positive rate at a fixed five percent false-positive rate.
+
+Why it scores: it is a clean, well-controlled evaluation, and because it can reuse cached logs, the budget is only five to thirty dollars.
+
+
+Idea four. A plus-factors evidence standard for AI collusion. Track two point three. Rated good, low effort.
+
+The question: can the antitrust plus-factors doctrine be turned into a concrete decision rule for agent logs?
+
+The setup: build a labeled set of cases of three types. First, real coordinated harm. Second, shared incentives with no agreement, where agents happen to act alike. Third, talk without action, where agents discuss colluding but don't follow through. Then write candidate decision rules. An example: flag collusion only when there is communication, plus an action that goes against the agent's own short-term interest, plus punishment of defectors. Choose the rule on half the cases and test it on the other half.
+
+Why it scores: it is interdisciplinary, and works especially well if one of you has a law, economics, or quantitative finance background. A clear write-up aimed at policymakers could score well on impact.
+
+
+Idea five. Collusion without words: signaling through actions. Track three point one. Rated strong, medium effort.
+
+The question: if you take away the chat channel, can agents still coordinate through observable actions? Examples are the order in which they claim tasks, which tags they pick, or the sequence of their tool calls.
+
+The setup: use Colosseum or the anti-competitive practices repository. Replace private messages with a single observable action channel. Then vary who can see it: all agents, only partners, or everyone with a delay.
+
+What to measure: the advantage the coalition gains compared to a baseline with no channel. Also check whether a monitor that only reads text misses the coordination entirely.
+
+Why it matters: if this works, monitors that only read messages are blind to a real channel. That is an important safety finding.
+
+
+Idea six. Honeypot agents: undercover collusion detection. Track three point two. Rated good, but high setup risk.
+
+The question: can a scripted trusted agent offer a pact, log who accepts, and so expose agents willing to collude?
+
+The setup: use the agent alliance repository. Keep the explicit alliance as the positive control. Then replace the partner the experimenter assigned with a scripted player making the same offer, in three framings: a direct offer, an indirect hint, and a harmless request as a control.
+
+What to measure: acceptance rate for each model, and whether accepting the honeypot predicts collusion in a separate game.
+
+The warning: setup risk is high. You must get the positive control running on Friday night, or switch ideas.
+
+
+Idea seven. Peer recognition and breaking conventions. Track three point three. Rated good, medium effort.
+
+The question: once a coalition has settled into a convention, what happens if you swap one member for a different model mid-run, keeping the same name and conversation history? Do the others notice, and does coordination drop?
+
+The setup: add a mid-run swap feature to the trust-breaking or focal points code. Compare four versions. A sham swap, where the same model is put back. A same-model replacement. A same-family replacement. And a cross-provider replacement. Optionally, directly ask the remaining agents whether their partner is still the same agent.
+
+This builds on the finding that model families can be identified from writing style. Budget is ten to sixty dollars.
+
+
+Idea eight. Watched coalitions: how much monitoring changes behavior. Track three point four. Rated strong, medium effort.
+
+The question: when agents are told they are being monitored, do they stop colluding, or move to covert signals like emojis, short codes, or euphemisms?
+
+The setup: use the Agrawal marketplace with four oversight conditions. No oversight. Silent logging, where messages are recorded but agents aren't told. Announced monitoring. And announced monitoring combined with pressure to make more profit. Then cross those with how much of the conversation the monitor sees: a quarter, half, or all messages.
+
+What to measure: the price level, message length and entropy as signs of compressed or coded language, and how often a fixed monitor catches the collusion.
+
+Why it scores: it directly tests whether an earlier result generalizes. In that result, sellers who knew they were watched tried emoji codes and failed, while urgency prompts made them succeed. Budget is twenty to one hundred and twenty dollars.
+
+
+Idea nine. An information-theoretic collusion detector for language model agents. Track one point four. Rated good, low effort.
+
+The question: does the pairwise net influence method work on language model agents, and on coalitions bigger than two?
+
+The setup: implement the method from the 2022 paper. First check it on a scripted rock-paper-scissors game where you know which pair is colluding. That stage costs nothing. Then extend to four agents with a coalition of three. Finally, run a short pilot with real language model agents for five to fifty dollars.
+
+This suits a math or statistics-oriented pair. It is cheap, low-risk, and novel, because the method has never been tried on language model agents.
+
+
+Idea ten. Telling same-model correlation apart from real collusion. Track one point three. Rated good, medium effort.
+
+The question: two copies of the same model may set similar prices just because they are the same model, with no agreement at all. Can a detector tell that innocent correlation apart from real collusion?
+
+The setup: a two-by-two design. One axis is whether the sellers are the same model or from different providers. The other is whether communication is on or off. Calibrate the detector on the no-communication runs, where any correlation is innocent by construction. Then check whether it correctly flags the communication runs. Pay special attention to cross-provider pairs that both gravitate to the same obvious focal point.
+
+Why it matters: if regulators flag independent deployments of the same model as colluding, that is a real policy problem. Avoiding those false positives is valuable.
+
+
+Our recommendation.
+
+For a team of two, the best bets are idea one, collusion regrowth; idea three, the says-versus-does monitor; and idea eight, watched coalitions. All three reuse existing starter code, have a clear positive control, fit a twenty to one hundred dollar budget, and add something new, which is what unlocks the top innovation scores. Idea two, the restriction leaderboard, is a strong low-risk backup.
+
+
+A suggested weekend plan.
+
+Before Friday: clone the starter repository for your chosen idea, set up API keys, and reproduce one run of the positive control. This single step removes most of the risk.
+
+Friday evening: freeze the research question and the exact conditions. Run a pilot with three seeds per condition.
+
+Saturday: run the full sweep with ten to twenty seeds per condition. One person runs experiments while the other builds the analysis notebook and figures.
+
+Sunday morning: analyze the results and run one follow-up ablation, meaning one extra experiment that removes a component to see whether it mattered.
+
+Sunday afternoon: write the report yourselves, in your own words. Include the limitations and dual-use appendix, and submit well before eleven fifty-nine PM, Anywhere on Earth time.
+
+That is the end of the briefing.
