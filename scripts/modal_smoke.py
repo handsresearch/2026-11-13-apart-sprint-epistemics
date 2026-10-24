@@ -1,4 +1,7 @@
-"""Smoke test: check Modal auth and remote execution work (CPU only, a few cents at most)."""
+"""Smoke test: check Modal auth and remote execution work (CPU only, a few cents at most).
+
+Run from a laptop: Claude cloud sessions cannot reach Modal (its gRPC client cannot use their HTTPS proxy).
+"""
 
 import modal
 
