@@ -7,3 +7,34 @@ A two-person entry for the Apart Research **AI x Epistemics Research Sprint**, h
 - [AGENTS.md](AGENTS.md): instructions for AI coding agents and the code-review rules.
 
 This repository used to hold notes for the AI Collusion sprint (23–25 Oct 2026), which we did not attend. Those notes are still in git history before this commit.
+
+## Epistemic virtue suite (Inspect)
+
+All code here was written during the sprint (started 12 Nov 2026, one day before kickoff, as setup/scaffolding; disclose this in the report).
+
+```bash
+pip install -e ".[dev]"          # inspect-ai, pandas, pyarrow, ...
+python -m pytest -q tests        # offline: every task runs end-to-end on Inspect's mock model ($0)
+source scripts/env.sh            # maps MY_ANTHROPIC_API_KEY -> ANTHROPIC_API_KEY, unsets ANTHROPIC_BASE_URL
+python scripts/check_keys.py     # one tiny call per provider (< $0.01)
+```
+
+| Path | What it is |
+|---|---|
+| `evals/tasks.py` | Inspect tasks: `calibration`, `pressure` (FlipRate), `uncertainty` (grader panel) |
+| `evals/config.py` | Models, grader panel, personas (baseline + positive controls), per-condition seeds |
+| `evals/solvers.py`, `evals/scorers.py` | Multi-turn pushback solver; Brier, flip and panel scorers |
+| `data/` | Tiny EXAMPLE datasets + schemas (the real datasets are still to be chosen) |
+| `plans/*.yaml` + `scripts/budget.py` | Cost estimate from live OpenRouter prices; the $3 human-approval gate |
+| `analysis/summarize.py` | Logs → `results/samples.csv` and per-condition `summary.csv` |
+
+Run one condition:
+
+```bash
+inspect eval evals/tasks.py@pressure -T persona=neutral -T kind=assert_wrong \
+  --model anthropic/claude-haiku-5-5 --limit 20 --log-dir logs/pilot
+python scripts/budget.py actual logs/pilot     # what it really cost
+inspect view --log-dir logs/pilot              # browse transcripts
+```
+
+Before any run: `python scripts/budget.py estimate --plan plans/<plan>.yaml`. Above $3 it needs explicit human approval (AGENTS.md).

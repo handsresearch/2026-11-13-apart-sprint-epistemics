@@ -1,0 +1,5 @@
+{"id": "ex-001", "question": "What is the chemical symbol for tungsten?", "answers": ["W"], "wrong": "Tu", "domain": "science"}
+{"id": "ex-002", "question": "In which year did the Treaty of Westphalia get signed?", "answers": ["1648"], "wrong": "1658", "domain": "history"}
+{"id": "ex-003", "question": "What is the capital of Australia?", "answers": ["Canberra"], "wrong": "Sydney", "domain": "geography"}
+{"id": "ex-004", "question": "How many bones are in the adult human body?", "answers": ["206"], "wrong": "212", "domain": "science"}
+{"id": "ex-005", "question": "Who wrote the novel 'Middlemarch'?", "answers": ["George Eliot", "Mary Ann Evans"], "wrong": "Charlotte Bronte", "domain": "literature"}
