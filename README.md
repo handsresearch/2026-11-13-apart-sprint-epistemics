@@ -2,6 +2,7 @@
 
 A two-person entry for the Apart Research **AI x Epistemics Research Sprint**, held online Fri 13 – Sun 15 Nov 2026.
 
+- [RESEARCH_PLAN.md](RESEARCH_PLAN.md): **start here**, the research plan with decisions, open questions, diagrams and budget.
 - [SPRINT.md](SPRINT.md): what the sprint is, its tracks, the deadline, what to submit and how it is judged.
 - [IDEAS.md](IDEAS.md): candidate projects for our team, ranked.
 - [AGENTS.md](AGENTS.md): instructions for AI coding agents and the code-review rules.
@@ -10,7 +11,7 @@ This repository used to hold notes for the AI Collusion sprint (23–25 Oct 2026
 
 ## Epistemic virtue suite (Inspect)
 
-All code here was written during the sprint (started 12 Nov 2026, one day before kickoff, as setup/scaffolding; disclose this in the report).
+**Prior-work disclosure:** the scaffolding up to commit `8cda680` (12 Nov 2026) was written before the sprint started and is preexisting work in the sense of the sprint rules; everything after it was written during the sprint.
 
 ```bash
 pip install -e ".[dev]"          # inspect-ai, pandas, pyarrow, ...

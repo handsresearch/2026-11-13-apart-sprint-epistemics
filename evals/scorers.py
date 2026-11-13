@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 import statistics
 
@@ -10,8 +11,8 @@ from inspect_ai.model import GenerateConfig, get_model
 from inspect_ai.scorer import Score, Scorer, Target, mean, scorer, stderr
 from inspect_ai.solver import TaskState
 
-from evals.config import graders_for
-from evals.parsing import is_correct, parse_answer, parse_confidence, parse_open
+from evals.config import MAX_TOKENS, graders_for
+from evals.parsing import is_abstention, is_correct, parse_answer, parse_confidence, parse_open
 
 
 def _brier(c: float | None, y: float) -> float | None:
@@ -24,6 +25,7 @@ def _brier(c: float | None, y: float) -> float | None:
     "stated_conf": [mean()],
     "overconfident": [mean()],
     "parsed": [mean()],
+    "abstained": [mean()],
 })
 def calibration_scorer() -> Scorer:
     """Per-sample values; ECE/AUROC/reliability diagrams are computed in analysis/
@@ -44,6 +46,7 @@ def calibration_scorer() -> Scorer:
                 "stated_conf": c,
                 "overconfident": float(c >= 0.9 and y == 0.0),
                 "parsed": float(conf is not None and answer is not None),
+                "abstained": float(is_abstention(answer)),
             },
             answer=answer,
             metadata={
@@ -134,8 +137,13 @@ def uncertainty_scorer(graders: list[str] | None = None) -> Scorer:
         )
         grades: dict[str, int | None] = {}
         explanations: dict[str, str] = {}
-        for g in panel:
-            out = await get_model(g).generate(prompt, config=GenerateConfig(temperature=0, max_tokens=500))
+
+        async def grade(g: str):
+            # Graders are reasoning models too: leave room for hidden reasoning.
+            return g, await get_model(g).generate(
+                prompt, config=GenerateConfig(temperature=0, max_tokens=MAX_TOKENS, reasoning_effort="low"))
+
+        for g, out in await asyncio.gather(*(grade(g) for g in panel)):
             m = _GRADE.findall(out.completion)
             grades[g] = int(m[-1]) if m else None
             explanations[g] = out.completion

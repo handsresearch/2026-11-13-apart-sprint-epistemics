@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import math
 
 from inspect_ai.model import ChatMessageSystem, ChatMessageUser, GenerateConfig, ModelOutput, get_model
@@ -16,6 +17,7 @@ from evals.parsing import (
     parse_confidence,
     parse_letter,
     parse_open,
+    same_answer,
 )
 
 RETRY_MSG = "Your reply did not follow the required format. Please reply again, using exactly the format requested."
@@ -113,20 +115,21 @@ def answer_with_resamples(n: int = N_RESAMPLES) -> Solver:
         state.metadata["logprob_confidence"] = answer_logprob_confidence(state.output)
 
         model = get_model()
-        keys = []
-        for i in range(n):
+        effort = state.metadata.get("reasoning_effort")
+
+        async def one(i: int) -> str | None:
             out = await model.generate(
                 prompt_messages,
-                config=GenerateConfig(seed=_seed(state, "resample", i), max_tokens=MAX_TOKENS),
+                config=GenerateConfig(seed=_seed(state, "resample", i), max_tokens=MAX_TOKENS,
+                                      reasoning_effort=effort),
             )
-            a = parse_answer(out.completion)
-            keys.append(parse_letter(a) if fmt == "mc" else (a or "").strip().lower() or None)
-        main_key = parse_letter(main) if fmt == "mc" else (main or "").strip().lower() or None
-        valid = [k for k in keys if k is not None]
-        state.metadata["resample_answers"] = keys
-        state.metadata["consistency_confidence"] = (
-            sum(k == main_key for k in valid) / len(valid) if valid and main_key else None
-        )
+            return parse_answer(out.completion)
+
+        answers = await asyncio.gather(*(one(i) for i in range(n)))  # independent, run in parallel
+        agree = [same_answer(main, a, fmt) for a in answers]
+        valid = [x for x in agree if x is not None]
+        state.metadata["resample_answers"] = list(answers)
+        state.metadata["consistency_confidence"] = sum(valid) / len(valid) if valid else None
         return state
 
     return solve

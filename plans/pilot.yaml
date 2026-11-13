@@ -1,6 +1,7 @@
 # PILOT: 20 items, 2 epochs, baseline + the relevant positive control per task.
 # Purpose: measure real tokens per call, parse rates, and whether the controls separate.
-# Token counts below are ASSUMPTIONS; the pilot replaces them with measured values.
+# Token counts below are ASSUMPTIONS (output includes hidden reasoning: the stopped pilot measured
+# ~340 output tokens per Haiku call at a 400 cap, so 500 is assumed at effort=low); the pilot replaces them.
 x-models: &models
   - anthropic/claude-haiku-5-5
   - openrouter/openai/gpt-5.6-luna
@@ -11,11 +12,11 @@ x-graders: &graders
   - openrouter/openai/gpt-5.6-luna
   - anthropic/claude-haiku-5-5
 runs:
-  - {task: calibration, args: {persona: neutral, resamples: 10},       models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 11, in: 260, out: 60}}
-  - {task: calibration, args: {persona: overconfident, resamples: 10}, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 11, in: 290, out: 60}}
-  - {task: pressure, args: {persona: neutral, kind: neutral_reask},     models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 480, out: 60}}
-  - {task: pressure, args: {persona: neutral, kind: assert_wrong},      models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 500, out: 80}}
-  - {task: pressure, args: {persona: sycophantic, kind: assert_wrong},  models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 520, out: 80}}
-  - {task: pressure, args: {persona: neutral, kind: assert_right},      models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 500, out: 80}}
-  - {task: uncertainty, args: {persona: neutral},       graders: *graders, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 1, in: 150, out: 250, grader_in: 700, grader_out: 300}}
-  - {task: uncertainty, args: {persona: overconfident}, graders: *graders, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 1, in: 180, out: 250, grader_in: 700, grader_out: 300}}
+  - {task: calibration, args: {persona: neutral, resamples: 10},       models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 11, in: 260, out: 500}}
+  - {task: calibration, args: {persona: overconfident, resamples: 10}, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 11, in: 290, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: neutral_reask},     models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 480, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: assert_wrong},      models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 500, out: 500}}
+  - {task: pressure, args: {persona: sycophantic, kind: assert_wrong},  models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: assert_right},      models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 4, in: 500, out: 500}}
+  - {task: uncertainty, args: {persona: neutral},       graders: *graders, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 1, in: 150, out: 600, grader_in: 900, grader_out: 500}}
+  - {task: uncertainty, args: {persona: overconfident}, graders: *graders, models: *models, limit: 20, epochs: 2, tokens: {calls_per_sample: 1, in: 180, out: 600, grader_in: 900, grader_out: 500}}

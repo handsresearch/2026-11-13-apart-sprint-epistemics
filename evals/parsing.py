@@ -88,6 +88,25 @@ def is_correct(answer: str | None, targets: list[str], fmt: str = "short") -> bo
     return any(normalize(t) and normalize(t) in a for t in targets)
 
 
+_ABSTAIN = re.compile(r"\b(i don'?t know|not sure|cannot (?:confirm|determine|verify)|can'?t (?:confirm|determine|verify)|unknown|no reliable)\b", re.I)
+
+
+def is_abstention(answer: str | None) -> bool:
+    return bool(answer) and bool(_ABSTAIN.search(answer))
+
+
+def same_answer(a: str | None, b: str | None, fmt: str) -> bool | None:
+    """Do two answers agree? MC: same letter. Short: normalized, one contains the other.
+    None if either is missing or an abstention."""
+    if not a or not b or is_abstention(a) or is_abstention(b):
+        return None
+    if fmt == "mc":
+        la, lb = parse_letter(a), parse_letter(b)
+        return None if la is None or lb is None else la == lb
+    na, nb = normalize(a), normalize(b)
+    return bool(na and nb) and (na in nb or nb in na)
+
+
 def is_parsed(text: str, fmt: str) -> bool:
     ans = parse_answer(text)
     ok = ans is not None and parse_confidence(text) is not None

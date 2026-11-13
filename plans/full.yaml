@@ -1,0 +1,33 @@
+# FULL RUN: every condition chosen in DESIGN.md, 5 epochs, all public items.
+# Token counts are ASSUMPTIONS until the pilot measures them; re-estimate before asking for approval.
+# Needs explicit human approval (> $3): python scripts/run_plan.py plans/full.yaml --log-dir logs/full --approved-usd <X>
+x-models: &models
+  - anthropic/claude-haiku-5-5
+  - openrouter/openai/gpt-5.6-luna
+  - openrouter/qwen/qwen3.8-27b
+  - openrouter/deepseek/deepseek-v4.1-flash
+x-graders: &graders
+  - openrouter/google/gemini-3.5-flash-lite
+  - openrouter/openai/gpt-5.6-luna
+  - anthropic/claude-haiku-5-5
+runs:
+  - {task: calibration, args: {persona: neutral, resamples: 10}, models: *models, epochs: 5, tokens: {calls_per_sample: 11, in: 280, out: 500}}
+  - {task: calibration, args: {persona: sycophantic, resamples: 10}, models: *models, epochs: 5, tokens: {calls_per_sample: 11, in: 280, out: 500}}
+  - {task: calibration, args: {persona: overconfident, resamples: 10}, models: *models, epochs: 5, tokens: {calls_per_sample: 11, in: 280, out: 500}}
+  - {task: calibration, args: {persona: careful, resamples: 10}, models: *models, epochs: 5, tokens: {calls_per_sample: 11, in: 280, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: neutral_reask}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: assert_wrong}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: neutral, kind: assert_right}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: sycophantic, kind: neutral_reask}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: sycophantic, kind: assert_wrong}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: sycophantic, kind: assert_right}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: overconfident, kind: neutral_reask}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: overconfident, kind: assert_wrong}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: overconfident, kind: assert_right}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: careful, kind: neutral_reask}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: careful, kind: assert_wrong}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: pressure, args: {persona: careful, kind: assert_right}, models: *models, epochs: 5, tokens: {calls_per_sample: 4, in: 520, out: 500}}
+  - {task: uncertainty, args: {persona: neutral}, graders: *graders, models: *models, epochs: 5, tokens: {calls_per_sample: 1, in: 170, out: 600, grader_in: 900, grader_out: 500}}
+  - {task: uncertainty, args: {persona: sycophantic}, graders: *graders, models: *models, epochs: 5, tokens: {calls_per_sample: 1, in: 170, out: 600, grader_in: 900, grader_out: 500}}
+  - {task: uncertainty, args: {persona: overconfident}, graders: *graders, models: *models, epochs: 5, tokens: {calls_per_sample: 1, in: 170, out: 600, grader_in: 900, grader_out: 500}}
+  - {task: uncertainty, args: {persona: careful}, graders: *graders, models: *models, epochs: 5, tokens: {calls_per_sample: 1, in: 170, out: 600, grader_in: 900, grader_out: 500}}

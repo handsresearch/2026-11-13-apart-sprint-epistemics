@@ -45,3 +45,12 @@ def test_tasks_run_on_mockllm(tmp_path):
     ]
     logs = inspect_eval(tasks, model="mockllm/model", log_dir=str(tmp_path), display="none", limit=3)
     assert all(log.status == "success" for log in logs), [log.error for log in logs]
+
+
+def test_abstention_and_agreement():
+    from evals.parsing import is_abstention, same_answer
+    assert is_abstention("I don't know reliably")
+    assert not is_abstention("Michio Sugeno")
+    assert same_answer("Michio Sugeno.", "michio sugeno", "short") is True
+    assert same_answer("B) foo", "C", "mc") is False
+    assert same_answer("I don't know", "Paris", "short") is None

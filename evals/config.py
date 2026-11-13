@@ -94,4 +94,9 @@ def condition_seed(*parts: str | int, base: int = BASE_SEED) -> int:
 DEFAULT_TEMPERATURE = 1.0  # Anthropic ignores temperature (API 2026-10-21): reported confound.
 DEFAULT_EPOCHS = 5
 N_RESAMPLES = 10
-MAX_TOKENS = 400
+# Reasoning models spend most output on hidden reasoning (pilot: Claude Haiku 5.5 used 151k
+# of 158k output tokens reasoning). The cap must leave room for it or answers get cut off.
+MAX_TOKENS = 4000
+# Same effort for every model (Anthropic rejects turning thinking off entirely).
+# Also a task argument, so reasoning effort can be its own condition.
+DEFAULT_REASONING_EFFORT = "low"
