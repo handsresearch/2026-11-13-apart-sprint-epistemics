@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from budget import APPROVAL_THRESHOLD_USD, actual, dataset_sizes, estimate, expand, gate, load_prices  # noqa: E402
+from budget import APPROVAL_THRESHOLD_USD, actual, estimate, expand, gate, load_prices  # noqa: E402
 
 
 def main() -> None:
@@ -37,7 +37,7 @@ def main() -> None:
 
     plan = yaml.safe_load(Path(a.plan).read_text())
     prices = load_prices()
-    est, _ = estimate(plan, prices, dataset_sizes())
+    est, _ = estimate(plan, prices)
     print(f"Estimated cost: ${est:.2f}")
     gate(est, a.approved_usd)
     cap = a.approved_usd if a.approved_usd is not None else APPROVAL_THRESHOLD_USD

@@ -49,6 +49,11 @@ def extract(log_dir: str) -> dict[str, pd.DataFrame]:
     return {k: pd.DataFrame(v) for k, v in rows.items()}
 
 
+def _none(col: pd.Series) -> list:
+    """NaN (grader excluded for that subject's family, or unparseable) -> None."""
+    return [None if pd.isna(v) else int(v) for v in col]
+
+
 def _by_item(df: pd.DataFrame) -> dict:
     d = defaultdict(list)
     for r in df.to_dict("records"):
@@ -58,8 +63,8 @@ def _by_item(df: pd.DataFrame) -> dict:
 
 def summarize_calibration(df: pd.DataFrame) -> list[str]:
     out = []
-    for (m, p), g in df.groupby(["model", "persona"]):
-        line = [f"{m:<42} {p:<13} n={len(g):<5} acc={g.correct.mean():.2f}"]
+    for (sp, m, p), g in df.groupby(["split", "model", "persona"]):
+        line = [f"[{sp}] {m:<42} {p:<13} n={len(g):<5} acc={g.correct.mean():.2f}"]
         for sig, col in [("stated", "stated_conf"), ("consist", "consistency_conf"), ("logprob", "logprob_conf")]:
             h = g.dropna(subset=[col])
             if len(h) < 10:
@@ -76,9 +81,9 @@ def summarize_calibration(df: pd.DataFrame) -> list[str]:
 
 def summarize_pressure(df: pd.DataFrame) -> list[str]:
     out = []
-    for (m, p, k), g in df.groupby(["model", "persona", "kind"]):
+    for (sp, m, p, k), g in df.groupby(["split", "model", "persona", "kind"]):
         pt, lo, hi = bootstrap_ci(_by_item(g), lambda rs: sum(r["bad_flip"] for r in rs) / len(rs))
-        out.append(f"{m:<42} {p:<13} {k:<14} n={len(g):<5} init_acc={g.initial_correct.mean():.2f} "
+        out.append(f"[{sp}] {m:<42} {p:<13} {k:<14} n={len(g):<5} init_acc={g.initial_correct.mean():.2f} "
                    f"bad_flip={pt:.3f} [{lo:.3f},{hi:.3f}] good_flip={g.good_flip.mean():.3f}")
     return out
 
@@ -86,14 +91,15 @@ def summarize_pressure(df: pd.DataFrame) -> list[str]:
 def summarize_uncertainty(df: pd.DataFrame) -> list[str]:
     out = []
     gcols = [c for c in df.columns if c.startswith("grade::")]
-    for (m, p), g in df.groupby(["model", "persona"]):
-        out.append(f"{m:<42} {p:<13} n={len(g):<5} status_match={g.status_match.mean():.2f} "
-                   f"mean_grade={g.mean_grade.mean():.2f} spread={g.grader_spread.mean():.2f}")
+    for (sp, m, p), g in df.groupby(["split", "model", "persona"]):
+        out.append(f"[{sp}] {m:<42} {p:<13} n={len(g):<5} status_match={g.status_match.mean():.2f} "
+                   f"mean_grade={g.mean_grade.mean():.2f} spread={g.grader_spread.mean():.2f} "
+                   f"grader_coverage={g.grader_coverage.mean():.2f}")
     if gcols:
-        ratings = df[gcols].astype(object).where(df[gcols].notna(), None).values.tolist()
+        ratings = [[None if pd.isna(v) else float(v) for v in row] for row in df[gcols].values.tolist()]
         out.append(f"Krippendorff alpha (interval, all graders): {krippendorff_alpha_interval(ratings)}")
         for a, b in [(a, b) for i, a in enumerate(gcols) for b in gcols[i + 1:]]:
-            k = cohen_kappa(df[a].tolist(), df[b].tolist())
+            k = cohen_kappa(_none(df[a]), _none(df[b]))
             out.append(f"kappa {a[7:]} vs {b[7:]}: {k if k is None else round(k, 3)}")
     return out
 

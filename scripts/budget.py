@@ -61,19 +61,41 @@ def expand(plan: dict) -> list[dict]:
     return out
 
 
+DEFAULT_DATASETS = {"calibration": "qa_calibration.jsonl", "pressure": "qa_pressure.jsonl",
+                    "uncertainty": "open_questions.jsonl"}
+
+
+def items_for(task: str, args: dict) -> int:
+    """Number of items the task will actually load, from the same dataset/split arguments
+    the run passes to it (see evals.tasks._load)."""
+    name = args.get("dataset", DEFAULT_DATASETS[task])
+    split = args.get("split", "public")
+    files = {"public": [ROOT / "data" / name], "private": [ROOT / "data" / "private" / name],
+             "all": [ROOT / "data" / name, ROOT / "data" / "private" / name]}[split]
+    missing = [f for f in files if not f.exists()]
+    if missing:
+        sys.exit(f"Cannot price {task} {args}: missing {missing[0]} (build the data first).")
+    return sum(1 for f in files for line in f.read_text().splitlines() if line.strip())
+
+
 def estimate(plan: dict, prices: dict, n_items: dict | None = None) -> tuple[float, list[dict]]:
     """Cost = items x epochs x calls_per_sample x (in x price_in + out x price_out) + graders.
-    Token counts per call come from the plan (measured in a pilot, otherwise assumed)."""
+    Items and the grader panel are resolved exactly as the run resolves them (the entry's
+    dataset/split and the task's default panel). Token counts come from the plan."""
+    from evals.config import GRADER_MODELS, graders_for
+
     total, rows = 0.0, []
     for r in expand(plan):
         t = r["tokens"]
-        n = min(r.get("limit") or 10**9, (n_items or {}).get(r["task"], r.get("limit") or 0)) * r.get("epochs", 1)
+        args = r.get("args", {}) or {}
+        items = items_for(r["task"], args)
+        n = min(r.get("limit") or items, items) * r.get("epochs", 1)
         pin, pout = price(r["model"], prices)
         cost = n * t["calls_per_sample"] * (t["in"] * pin + t["out"] * pout)
-        from evals.config import graders_for
-        for g in graders_for(r["model"], r.get("graders")) if r.get("graders") else []:
+        panel = graders_for(r["model"], r.get("graders") or GRADER_MODELS) if r["task"] == "uncertainty" else []
+        for g in panel:
             gin, gout = price(g, prices)
-            cost += n * (t.get("grader_in", 700) * gin + t.get("grader_out", 300) * gout)
+            cost += n * (t.get("grader_in", 900) * gin + t.get("grader_out", 500) * gout)
         rows.append({"task": r["task"], "args": r.get("args", {}), "model": r["model"],
                      "calls": n * t["calls_per_sample"], "usd": round(cost, 4)})
         total += cost
@@ -129,7 +151,7 @@ def main() -> None:
 
     prices = load_prices(refresh=getattr(args, "refresh_prices", False))
     if args.cmd == "estimate":
-        total, rows = estimate(yaml.safe_load(Path(args.plan).read_text()), prices, dataset_sizes())
+        total, rows = estimate(yaml.safe_load(Path(args.plan).read_text()), prices)
         for row in rows:
             print(f"{row['task']:<12} {str(row['args']):<45} {row['model']:<42} calls={row['calls']:<6} ${row['usd']:.3f}")
         print(f"TOTAL ESTIMATE: ${total:.2f}  (approval needed above ${APPROVAL_THRESHOLD_USD:.0f})")

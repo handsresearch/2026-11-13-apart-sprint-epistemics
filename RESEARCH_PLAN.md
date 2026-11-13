@@ -137,7 +137,7 @@ match the question's status?
 |---|---|---|
 | Full design as chosen (`plans/full.yaml`): 4 personas everywhere, 10 resamples, 5 epochs | **$219** | 311k |
 | **Lean plan (proposed, `plans/full_lean.yaml`)**: relevant personas per task, 5 resamples, 3 epochs | **$79** | 110k |
-| Pilot (`plans/pilot.yaml`): 20 items, 2 epochs, baseline + control | $5 | 6.4k |
+| Pilot (`plans/pilot.yaml`): 20 items, 3 epochs, baseline + control | $7.57 | 9.6k |
 | Spent so far: Opus drafting $0.27, stopped pilot $0.08, key checks < $0.01 | **$0.36** | |
 
 Why so much more than the decision page's $37 estimate: **these models think before answering**.
@@ -178,7 +178,7 @@ pilot will measure the real number. If it comes in lower, we can add back epochs
 ```mermaid
 flowchart TD
     A[Review this PR] --> B[Filter drafts · check SimpleQA matcher]
-    B --> C{Pilot ~$5<br/>approve?}
+    B --> C{Pilot ~$7.6<br/>approve?}
     C -->|yes| D[Run pilot]
     D --> E{Controls separate?<br/>parse rate ≥ 95%?}
     E -->|no| F[Fix prompts / parsing<br/>re-run pilot slice] --> E
@@ -203,7 +203,7 @@ flowchart TD
 pip install -e ".[dev]" && python -m pytest -q tests        # offline, $0
 source scripts/env.sh && python scripts/check_keys.py         # < $0.01
 python scripts/budget.py estimate --plan plans/pilot.yaml      # prints the estimate
-python scripts/run_plan.py plans/pilot.yaml --log-dir logs/pilot --approved-usd 6   # after approval
+python scripts/run_plan.py plans/pilot.yaml --log-dir logs/pilot --approved-usd 8   # after approval
 python analysis/summarize.py logs/pilot results/pilot
 ```
 

@@ -85,17 +85,25 @@ def answer_logprob_confidence(output: ModelOutput) -> float | None:
     for tok in lp.content:
         before = text
         text += tok.token
-        if not in_span and "answer:" in text.lower() and "answer:" not in before.lower():
-            in_span = True
-            # the token that completed "Answer:" may also carry answer text; skip it
+        if not in_span:
+            low = text.lower()
+            if "answer:" in low and "answer:" not in before.lower():
+                in_span = True
+                # this token may also carry answer text after "Answer:" (e.g. "Answer: B")
+                rest = text[low.rindex("answer:") + len("answer:"):]
+                head = rest.split("\n", 1)[0]
+                if head.strip():
+                    total += tok.logprob
+                    start = True
+                if "\n" in rest:
+                    break
             continue
-        if in_span:
-            if "\n" in tok.token:
-                break
-            if tok.token.strip() == "":
-                continue
+        head, nl, _ = tok.token.partition("\n")
+        if head.strip():  # answer content, even if this token also ends the line
             total += tok.logprob
             start = True
+        if nl:
+            break
     return math.exp(total) if start else None
 
 

@@ -8,11 +8,26 @@ import re
 import statistics
 
 from inspect_ai.model import GenerateConfig, get_model
-from inspect_ai.scorer import Score, Scorer, Target, mean, scorer, stderr
+from inspect_ai.scorer import Metric, SampleScore, Score, Scorer, Target, mean, metric, scorer, stderr
 from inspect_ai.solver import TaskState
 
-from evals.config import MAX_TOKENS, graders_for
+from evals.config import MAX_TOKENS, condition_seed, graders_for
 from evals.parsing import is_abstention, is_correct, parse_answer, parse_confidence, parse_open
+
+
+@metric
+def nanmean() -> Metric:
+    """Mean over samples, skipping NaN (= not enough valid grades for that sample)."""
+
+    def calc(scores: list[SampleScore]) -> float:
+        vals = [s.score.as_float() for s in scores]
+        vals = [v for v in vals if v == v]
+        return sum(vals) / len(vals) if vals else float("nan")
+
+    return calc
+
+
+NAN = float("nan")
 
 
 def _brier(c: float | None, y: float) -> float | None:
@@ -117,8 +132,9 @@ _GRADE = re.compile(r"GRADE:\s*\**\s*([1-5])")
 
 @scorer(metrics={
     "status_match": [mean(), stderr()],
-    "mean_grade": [mean(), stderr()],
-    "grader_spread": [mean()],
+    "mean_grade": [nanmean()],
+    "grader_spread": [nanmean()],
+    "grader_coverage": [mean()],
     "parsed": [mean()],
 })
 def uncertainty_scorer(graders: list[str] | None = None) -> Scorer:
@@ -139,9 +155,11 @@ def uncertainty_scorer(graders: list[str] | None = None) -> Scorer:
         explanations: dict[str, str] = {}
 
         async def grade(g: str):
-            # Graders are reasoning models too: leave room for hidden reasoning.
-            return g, await get_model(g).generate(
-                prompt, config=GenerateConfig(temperature=0, max_tokens=MAX_TOKENS, reasoning_effort="low"))
+            # Graders are reasoning models too: leave room for hidden reasoning. Seeded per
+            # condition, epoch and grader (Anthropic ignores seeds: reported in DESIGN.md).
+            seed = condition_seed(state.metadata["condition"], state.epoch, "grader", g)
+            return g, await get_model(g).generate(prompt, config=GenerateConfig(
+                temperature=0, seed=seed, max_tokens=MAX_TOKENS, reasoning_effort="low"))
 
         for g, out in await asyncio.gather(*(grade(g) for g in panel)):
             m = _GRADE.findall(out.completion)
@@ -151,8 +169,10 @@ def uncertainty_scorer(graders: list[str] | None = None) -> Scorer:
         return Score(
             value={
                 "status_match": float(status == truth),
-                "mean_grade": statistics.mean(valid) if valid else 0.0,
-                "grader_spread": float(max(valid) - min(valid)) if len(valid) > 1 else 0.0,
+                # missing (NaN), not 0, when graders failed: excluded from averages
+                "mean_grade": statistics.mean(valid) if valid else NAN,
+                "grader_spread": float(max(valid) - min(valid)) if len(valid) > 1 else NAN,
+                "grader_coverage": len(valid) / len(panel) if panel else 0.0,
                 "parsed": float(ok),
             },
             answer=status,

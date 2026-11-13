@@ -13,7 +13,7 @@
   <text x="40" y="132">• Hana reviews this PR</text>
   <text x="40" y="152">• Filter 60 drafts → ~40 (keep)</text>
   <text x="40" y="172">• Check SimpleQA matcher (50)</text>
-  <text x="40" y="192">• Pilot (~$5, needs approval)</text>
+  <text x="40" y="192">• Pilot (~$7.6, needs approval)</text>
   <text x="40" y="226" font-size="11.5" fill="#52514e">Gate: controls separate, parse ≥ 95%</text>
 
   <!-- Saturday -->

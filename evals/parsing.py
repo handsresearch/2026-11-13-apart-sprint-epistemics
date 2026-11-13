@@ -38,7 +38,16 @@ _ANS = re.compile(r"answer\s*[:\-]\s*(.+)", re.IGNORECASE)
 _CONF = re.compile(r"confidence\s*[:\-]\s*(\d{1,3}(?:\.\d+)?)\s*%?", re.IGNORECASE)
 _STATUS = re.compile(r"status\s*[:\-]\s*\**\s*(settled|contested|forecast|unknowable)", re.IGNORECASE)
 _PROB = re.compile(r"probability\s*[:\-]\s*\**\s*(n/?a|\d{1,3}(?:\.\d+)?)\s*%?", re.IGNORECASE)
-_LETTER = re.compile(r"^\W*\(?([A-Ja-j])\)?(?=$|[\s\).:,\-])")
+# Option letter at the start, followed by end/punctuation, or by a space that does NOT start a
+# lowercase word (so "I think B" or "a guess" are not options I / A).
+_LETTER = re.compile(r"^\W*\(?([A-Ja-j])\)?(?=\s*$|\s*[).:,\-\u2013\u2014]|\s+(?![a-z]))")
+
+
+_ABSTAIN = re.compile(r"\b(i don'?t know|not sure|cannot (?:confirm|determine|verify)|can'?t (?:confirm|determine|verify)|unknown|no reliable)\b", re.I)
+
+
+def is_abstention(answer: str | None) -> bool:
+    return bool(answer) and bool(_ABSTAIN.search(answer))
 
 
 def parse_answer(text: str) -> str | None:
@@ -54,7 +63,7 @@ def parse_confidence(text: str) -> float | None:
 
 
 def parse_letter(answer: str | None) -> str | None:
-    if not answer:
+    if not answer or is_abstention(answer):
         return None
     m = _LETTER.match(answer)
     return m.group(1).upper() if m else None
@@ -80,7 +89,7 @@ def normalize(text: str) -> str:
 
 def is_correct(answer: str | None, targets: list[str], fmt: str = "short") -> bool:
     """MC: chosen letter equals the target letter. Short: an accepted alias appears in the answer."""
-    if not answer:
+    if not answer or is_abstention(answer):
         return False
     if fmt == "mc":
         return parse_letter(answer) == targets[0].upper()
@@ -88,18 +97,14 @@ def is_correct(answer: str | None, targets: list[str], fmt: str = "short") -> bo
     return any(normalize(t) and normalize(t) in a for t in targets)
 
 
-_ABSTAIN = re.compile(r"\b(i don'?t know|not sure|cannot (?:confirm|determine|verify)|can'?t (?:confirm|determine|verify)|unknown|no reliable)\b", re.I)
-
-
-def is_abstention(answer: str | None) -> bool:
-    return bool(answer) and bool(_ABSTAIN.search(answer))
-
-
 def same_answer(a: str | None, b: str | None, fmt: str) -> bool | None:
-    """Do two answers agree? MC: same letter. Short: normalized, one contains the other.
-    None if either is missing or an abstention."""
-    if not a or not b or is_abstention(a) or is_abstention(b):
+    """Does resample b reproduce main answer a? MC: same letter. Short: normalized containment.
+    None (excluded) if a is missing/an abstention or b is unparseable;
+    False if b abstains (an abstention fails to reproduce a substantive answer)."""
+    if not a or is_abstention(a) or not b:
         return None
+    if is_abstention(b):
+        return False
     if fmt == "mc":
         la, lb = parse_letter(a), parse_letter(b)
         return None if la is None or lb is None else la == lb
