@@ -57,4 +57,5 @@ through the Claude app (AGENTS.md).
 Scaffolding was written on 12 Nov 2026, the day before kickoff: commits up to `8cda680` (Inspect
 skeleton, cost estimator, tests). The rules allow prior work if it is clearly identified in the
 README and the report; undisclosed prior work can disqualify. Everything after `8cda680` was done
-during the sprint.
+during the sprint: kickoff was 13 Nov 15:00 Zurich time (14:00 UTC), and the next commit (`97f4b02`) and all API runs
+(Opus drafting, pilot slice) came after it.

@@ -11,7 +11,7 @@ This repository used to hold notes for the AI Collusion sprint (23–25 Oct 2026
 
 ## Epistemic virtue suite (Inspect)
 
-**Prior-work disclosure:** the scaffolding up to commit `8cda680` (12 Nov 2026) was written before the sprint started and is preexisting work in the sense of the sprint rules; everything after it was written during the sprint.
+**Prior-work disclosure:** the scaffolding up to commit `8cda680` (12 Nov 2026) was written before the sprint started and is preexisting work in the sense of the sprint rules; everything after it was written during the sprint (kickoff: 13 Nov 2026, 15:00 Zurich time = 14:00 UTC; the first sprint commit, `97f4b02`, is from 14:53 UTC).
 
 ```bash
 pip install -e ".[dev]"          # inspect-ai, pandas, pyarrow, ...
