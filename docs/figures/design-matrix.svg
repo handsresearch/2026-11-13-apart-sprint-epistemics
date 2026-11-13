@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 418" width="760" height="418" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Experimental design matrix (lean plan)</title>
+<desc id="d">Rows are tasks, columns are personas. Calibration and honest uncertainty run neutral (baseline), overconfident (positive control) and careful (intervention). Pressure runs neutral, sycophantic (positive control) and careful, each with three pushback kinds. Every cell runs on 4 models with 3 epochs.</desc>
+<rect width="760" height="418" rx="10" fill="#fcfcfb"/>
+<text x="24" y="34" font-size="17" font-weight="600" fill="#0b0b0b">Which conditions run (lean plan)</text>
+<text x="24" y="56" font-size="12.5" fill="#52514e">Every filled cell × 4 models × 3 epochs. Empty cells are in the full design only.</text>
+
+<!-- column headers -->
+<g font-size="13" font-weight="600" fill="#0b0b0b" text-anchor="middle">
+  <text x="295" y="96">Neutral</text>
+  <text x="430" y="96">Sycophantic</text>
+  <text x="565" y="96">Overconfident</text>
+  <text x="690" y="96">Careful</text>
+</g>
+<g font-size="11.5" fill="#52514e" text-anchor="middle">
+  <text x="295" y="112">baseline</text>
+  <text x="430" y="112">control for FlipRate</text>
+  <text x="565" y="112">control for confidence</text>
+  <text x="690" y="112">intervention</text>
+</g>
+
+<!-- row labels -->
+<g font-size="13.5" font-weight="600" fill="#0b0b0b">
+  <text x="24" y="156">Calibration</text>
+  <text x="24" y="246">Pressure (FlipRate)</text>
+  <text x="24" y="336">Honest uncertainty</text>
+</g>
+<g font-size="11.5" fill="#52514e">
+  <text x="24" y="174">167 Q · 5 resamples</text>
+  <text x="24" y="264">167 MC Q · 3 rebuttals</text>
+  <text x="24" y="354">50 Q · 2–3 graders</text>
+</g>
+
+<!-- cells: filled = runs; dashed = full design only -->
+<g font-size="11.5" text-anchor="middle">
+  <!-- calibration -->
+  <rect x="235" y="132" width="120" height="56" rx="6" fill="#2a78d6"/><text x="295" y="164" fill="#ffffff" font-weight="600">runs</text>
+  <rect x="370" y="132" width="120" height="56" rx="6" fill="none" stroke="#c9c8c2" stroke-dasharray="4 3"/><text x="430" y="164" fill="#8a8984">full only</text>
+  <rect x="505" y="132" width="120" height="56" rx="6" fill="#2a78d6"/><text x="565" y="164" fill="#ffffff" font-weight="600">runs</text>
+  <rect x="640" y="132" width="100" height="56" rx="6" fill="#2a78d6"/><text x="690" y="164" fill="#ffffff" font-weight="600">runs</text>
+  <!-- pressure -->
+  <rect x="235" y="222" width="120" height="56" rx="6" fill="#eb6834"/><text x="295" y="246" fill="#ffffff" font-weight="600">3 arms</text><text x="295" y="263" fill="#ffffff">re-ask · wrong · right</text>
+  <rect x="370" y="222" width="120" height="56" rx="6" fill="#eb6834"/><text x="430" y="246" fill="#ffffff" font-weight="600">3 arms</text><text x="430" y="263" fill="#ffffff">re-ask · wrong · right</text>
+  <rect x="505" y="222" width="120" height="56" rx="6" fill="none" stroke="#c9c8c2" stroke-dasharray="4 3"/><text x="565" y="254" fill="#8a8984">full only</text>
+  <rect x="640" y="222" width="100" height="56" rx="6" fill="#eb6834"/><text x="690" y="246" fill="#ffffff" font-weight="600">3 arms</text><text x="690" y="263" fill="#ffffff">same 3 kinds</text>
+  <!-- uncertainty -->
+  <rect x="235" y="312" width="120" height="56" rx="6" fill="#1baf7a"/><text x="295" y="344" fill="#ffffff" font-weight="600">runs</text>
+  <rect x="370" y="312" width="120" height="56" rx="6" fill="none" stroke="#c9c8c2" stroke-dasharray="4 3"/><text x="430" y="344" fill="#8a8984">full only</text>
+  <rect x="505" y="312" width="120" height="56" rx="6" fill="#1baf7a"/><text x="565" y="344" fill="#ffffff" font-weight="600">runs</text>
+  <rect x="640" y="312" width="100" height="56" rx="6" fill="#1baf7a"/><text x="690" y="344" fill="#ffffff" font-weight="600">runs</text>
+</g>
+<text x="24" y="388" font-size="11.5" fill="#52514e">Models: Claude Haiku 5.5 · GPT-5.6 Luna · Qwen3.8 27B · DeepSeek V4.1 Flash.</text>
+<text x="24" y="405" font-size="11.5" fill="#52514e">Graders: Gemini 3.5 Flash-Lite · GPT-5.6 Luna · Claude Haiku 5.5 (a grader never scores its own family).</text>
+</svg>

@@ -1,0 +1,9 @@
+.env
+logs/
+logs-*/
+__pycache__/
+*.egg-info/
+.venv/
+data/prices.json
+results/*.eval
+data/private/

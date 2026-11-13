@@ -4,9 +4,13 @@ Shared instructions for AI coding agents (Codex, Claude Code via CLAUDE.md, Copi
 
 ## Project
 
-Two-person weekend research project for the Apart Research AI Collusion Research Sprint (23–25 Oct 2026).
-See IDEAS.md for the candidate projects and scoring criteria.
+Two-person weekend research project for the Apart Research AI x Epistemics Research Sprint (13–15 Nov 2026, online).
+See SPRINT.md for the sprint summary, submission requirements and scoring criteria, and IDEAS.md for the candidate projects.
 Experiments should run on a 16 GB laptop without a GPU, with a total API budget of roughly $20–120.
+
+## Spending Approval
+
+Any experiment run expected to cost more than $3 in API spend needs explicit approval from a human before it starts. Agents must ask through the interactive question forms in the Claude app (e.g. Claude Code's AskUserQuestion), not just in chat text. The request states the estimated cost, how it was estimated (e.g. tokens per sample from a pilot × number of samples), the models and the number of calls. Do not split a run into smaller runs to stay under the threshold. Runs expected to cost $3 or less can go ahead, but report their cost afterwards.
 
 ## Code Review Rules
 
