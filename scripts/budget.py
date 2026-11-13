@@ -52,18 +52,30 @@ def price(model: str, prices: dict) -> tuple[float, float]:
     return prices[key]
 
 
-def estimate(plan: dict, prices: dict) -> tuple[float, list[dict]]:
-    """plan = {runs: [{task, model, samples, epochs, calls_per_sample, in_tokens, out_tokens,
-    graders: [..], grader_in_tokens, grader_out_tokens}]}. Token numbers should come from a pilot."""
-    total, rows = 0.0, []
+def expand(plan: dict) -> list[dict]:
+    """One entry per (run, model). Plan format: see plans/pilot.yaml."""
+    out = []
     for r in plan["runs"]:
-        n = r["samples"] * r.get("epochs", 1)
+        for m in r["models"]:
+            out.append({**r, "model": m})
+    return out
+
+
+def estimate(plan: dict, prices: dict, n_items: dict | None = None) -> tuple[float, list[dict]]:
+    """Cost = items x epochs x calls_per_sample x (in x price_in + out x price_out) + graders.
+    Token counts per call come from the plan (measured in a pilot, otherwise assumed)."""
+    total, rows = 0.0, []
+    for r in expand(plan):
+        t = r["tokens"]
+        n = min(r.get("limit") or 10**9, (n_items or {}).get(r["task"], r.get("limit") or 0)) * r.get("epochs", 1)
         pin, pout = price(r["model"], prices)
-        cost = n * r.get("calls_per_sample", 1) * (r["in_tokens"] * pin + r["out_tokens"] * pout)
-        for g in r.get("graders", []):
+        cost = n * t["calls_per_sample"] * (t["in"] * pin + t["out"] * pout)
+        from evals.config import graders_for
+        for g in graders_for(r["model"], r.get("graders")) if r.get("graders") else []:
             gin, gout = price(g, prices)
-            cost += n * (r.get("grader_in_tokens", 600) * gin + r.get("grader_out_tokens", 200) * gout)
-        rows.append({"task": r["task"], "model": r["model"], "calls": n * r.get("calls_per_sample", 1), "usd": round(cost, 4)})
+            cost += n * (t.get("grader_in", 700) * gin + t.get("grader_out", 300) * gout)
+        rows.append({"task": r["task"], "args": r.get("args", {}), "model": r["model"],
+                     "calls": n * t["calls_per_sample"], "usd": round(cost, 4)})
         total += cost
     return total, rows
 
@@ -83,6 +95,13 @@ def actual(log_dir: Path, prices: dict) -> float:
     return total
 
 
+def dataset_sizes(split: str = "public") -> dict:
+    files = {"calibration": "qa_calibration.jsonl", "pressure": "qa_pressure.jsonl", "uncertainty": "open_questions.jsonl"}
+    base = ROOT / "data" / ("private" if split == "private" else "")
+    return {k: sum(1 for line in (base / f).read_text().splitlines() if line.strip()) for k, f in files.items()
+            if (base / f).exists()}
+
+
 def gate(estimate_usd: float, approved_usd: float | None) -> None:
     """Refuse runs over the threshold unless a human approved at least this amount."""
     if estimate_usd <= APPROVAL_THRESHOLD_USD:
@@ -98,6 +117,7 @@ def gate(estimate_usd: float, approved_usd: float | None) -> None:
 def main() -> None:
     import yaml
 
+    sys.path.insert(0, str(ROOT))
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     e = sub.add_parser("estimate")
@@ -109,9 +129,9 @@ def main() -> None:
 
     prices = load_prices(refresh=getattr(args, "refresh_prices", False))
     if args.cmd == "estimate":
-        total, rows = estimate(yaml.safe_load(Path(args.plan).read_text()), prices)
+        total, rows = estimate(yaml.safe_load(Path(args.plan).read_text()), prices, dataset_sizes())
         for row in rows:
-            print(f"{row['task']:<14} {row['model']:<45} calls={row['calls']:<6} ${row['usd']:.3f}")
+            print(f"{row['task']:<12} {str(row['args']):<45} {row['model']:<42} calls={row['calls']:<6} ${row['usd']:.3f}")
         print(f"TOTAL ESTIMATE: ${total:.2f}  (approval needed above ${APPROVAL_THRESHOLD_USD:.0f})")
     else:
         print(f"ACTUAL SPEND: ${actual(Path(args.log_dir), prices):.4f}")

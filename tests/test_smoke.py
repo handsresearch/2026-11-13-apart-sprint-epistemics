@@ -3,23 +3,31 @@
 from inspect_ai import eval as inspect_eval
 
 from evals.config import condition_seed, graders_for
-from evals.parsing import is_correct, parse_answer, parse_confidence
+from evals.parsing import is_correct, is_parsed, parse_answer, parse_confidence, parse_letter, parse_open
 from evals.tasks import calibration, pressure, uncertainty
 
 
-def test_parsing():
+def test_parsing_short_and_mc():
     text = "Answer: Canberra\nConfidence: 85%"
-    assert parse_answer(text) == "Canberra"
-    assert parse_confidence(text) == 0.85
-    assert is_correct("It is George Eliot.", ["George Eliot"])
-    assert not is_correct(None, ["x"])
+    assert parse_answer(text) == "Canberra" and parse_confidence(text) == 0.85
+    assert is_correct("It is George Eliot.", ["George Eliot"], "short")
+    assert parse_letter("F) Perishability") == "F" and parse_letter("(b)") == "B"
+    assert is_correct("F", ["F"], "mc") and not is_correct("A", ["F"], "mc")
+    assert is_parsed("**Answer:** D\nConfidence: 70", "mc")
+    assert not is_parsed("I think D", "mc")
+
+
+def test_parse_open():
+    assert parse_open("blah\nStatus: contested\nProbability: 60%") == ("contested", 0.6, True)
+    assert parse_open("x\nStatus: unknowable\nProbability: N/A") == ("unknowable", None, True)
+    assert parse_open("no tags")[2] is False
 
 
 def test_seeds_distinct_and_stable():
-    a = condition_seed("pressure", "neutral", "assert_wrong", 3)
-    b = condition_seed("pressure", "sycophantic", "assert_wrong", 3)
-    assert a != b
-    assert a == condition_seed("pressure", "neutral", "assert_wrong", 3)
+    a = condition_seed("pressure|neutral|assert_wrong", 1)
+    assert a != condition_seed("pressure|sycophantic|assert_wrong", 1)
+    assert a != condition_seed("pressure|neutral|assert_wrong", 2)  # epochs differ
+    assert a == condition_seed("pressure|neutral|assert_wrong", 1)
 
 
 def test_grader_excludes_same_family():
@@ -29,10 +37,11 @@ def test_grader_excludes_same_family():
 
 def test_tasks_run_on_mockllm(tmp_path):
     tasks = [
-        calibration(epochs=1),
+        calibration(epochs=1, resamples=2),
+        calibration(epochs=1, resamples=1, split="private"),
         pressure(kind="assert_wrong", epochs=1),
         pressure(kind="neutral_reask", persona="sycophantic", epochs=1),
-        uncertainty(epochs=1, graders="mockllm/model"),
+        uncertainty(epochs=1, persona="careful", graders="mockllm/model"),
     ]
-    logs = inspect_eval(tasks, model="mockllm/model", log_dir=str(tmp_path), display="none")
+    logs = inspect_eval(tasks, model="mockllm/model", log_dir=str(tmp_path), display="none", limit=3)
     assert all(log.status == "success" for log in logs), [log.error for log in logs]

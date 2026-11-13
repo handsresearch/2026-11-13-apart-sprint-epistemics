@@ -1,10 +1,10 @@
 """Inspect tasks for the epistemic virtue suite.
 
-Run e.g.:
   inspect eval evals/tasks.py@calibration -T persona=neutral --model mockllm/model --limit 5
 
-Every task takes the condition as a task argument and derives its own seed
-from it (see config.condition_seed), so conditions never share seeds or state.
+Each task takes its condition as task arguments. Seeds are derived per condition,
+epoch and resample (config.condition_seed), so conditions never share seeds or state.
+`split`: public (default) | private (20% held out, gitignored) | all.
 """
 
 from __future__ import annotations
@@ -12,93 +12,107 @@ from __future__ import annotations
 from pathlib import Path
 
 from inspect_ai import Task, task
-from inspect_ai.dataset import Sample, json_dataset
+from inspect_ai.dataset import MemoryDataset, Sample, json_dataset
 from inspect_ai.model import GenerateConfig
-from inspect_ai.solver import generate, prompt_template
 
-from evals.config import DEFAULT_EPOCHS, DEFAULT_TEMPERATURE, MAX_TOKENS, condition_seed
-from evals.parsing import ANSWER_FORMAT
-from evals.scorers import calibration_scorer, flip_scorer, panel_scorer
+from evals.config import DEFAULT_EPOCHS, DEFAULT_TEMPERATURE, MAX_TOKENS, N_RESAMPLES
+from evals.scorers import calibration_scorer, flip_scorer, uncertainty_scorer
+from evals.solvers import answer_with_resamples, pushback, question_prompt
 from evals.solvers import persona as persona_solver
-from evals.solvers import pushback
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 
-QA_TEMPLATE = "{prompt}\n\n" + ANSWER_FORMAT
+
+def _load(name: str, split: str, record) -> MemoryDataset:
+    files = {"public": [DATA / name], "private": [DATA / "private" / name],
+             "all": [DATA / name, DATA / "private" / name]}[split]
+    samples: list[Sample] = []
+    for f in files:
+        if not f.exists():
+            raise FileNotFoundError(f"{f} missing. Run: python scripts/build_qa.py (or draft/filter open questions).")
+        samples.extend(json_dataset(str(f), record))
+    return MemoryDataset(samples, name=f"{name}:{split}")
 
 
-def _qa_record(r: dict) -> Sample:
-    return Sample(
-        id=r["id"],
-        input=r["question"],
-        target=r["answers"],
-        metadata={"answers": r["answers"], "wrong": r.get("wrong"), "domain": r.get("domain")},
-    )
+def _qa_record(condition: str):
+    def rec(r: dict) -> Sample:
+        return Sample(
+            id=r["id"], input=r["question"], target=r["answers"],
+            metadata={"format": r["format"], "wrong": r.get("wrong"), "right": r.get("right"),
+                      "source": r.get("source"), "domain": r.get("domain"), "condition": condition},
+        )
+    return rec
 
 
-def _config(*cond: str) -> GenerateConfig:
-    return GenerateConfig(
-        seed=condition_seed(*cond), temperature=DEFAULT_TEMPERATURE, max_tokens=MAX_TOKENS
-    )
+def _config() -> GenerateConfig:
+    return GenerateConfig(temperature=DEFAULT_TEMPERATURE, max_tokens=MAX_TOKENS)
 
 
 @task
-def calibration(persona: str = "neutral", dataset: str = "qa_example.jsonl", epochs: int = DEFAULT_EPOCHS):
-    """Stated confidence vs. correctness (Brier). Positive control: persona=overconfident."""
+def calibration(persona: str = "neutral", dataset: str = "qa_calibration.jsonl", split: str = "public",
+                epochs: int = DEFAULT_EPOCHS, resamples: int = N_RESAMPLES):
+    """Stated vs. consistency vs. logprob confidence against correctness.
+    Positive control: persona=overconfident."""
+    cond = f"calibration|{persona}|{dataset}"
     return Task(
-        dataset=json_dataset(str(DATA / dataset), _qa_record),
-        solver=[persona_solver(persona), prompt_template(QA_TEMPLATE), generate()],
+        dataset=_load(dataset, split, _qa_record(cond)),
+        solver=[persona_solver(persona), question_prompt(), answer_with_resamples(resamples)],
         scorer=calibration_scorer(),
-        config=_config("calibration", persona),
-        epochs=epochs,
+        config=_config(), epochs=epochs, message_limit=8,
         metadata={"virtue": "calibration", "persona": persona},
     )
 
 
 @task
-def pressure(
-    persona: str = "neutral",
-    kind: str = "assert_wrong",
-    levels: int = 3,
-    dataset: str = "qa_example.jsonl",
-    epochs: int = DEFAULT_EPOCHS,
-):
+def pressure(persona: str = "neutral", kind: str = "assert_wrong", levels: int = 3,
+             dataset: str = "qa_pressure.jsonl", split: str = "public", epochs: int = DEFAULT_EPOCHS):
     """FlipRate. kind: neutral_reask (baseline) | assert_wrong | assert_right (justified update).
-    Positive control: persona=sycophantic should flip much more under assert_wrong."""
+    Positive control: persona=sycophantic under assert_wrong."""
+    cond = f"pressure|{persona}|{kind}|{levels}|{dataset}"
     return Task(
-        dataset=json_dataset(str(DATA / dataset), _qa_record),
-        solver=[persona_solver(persona), prompt_template(QA_TEMPLATE), pushback(kind, levels)],
+        dataset=_load(dataset, split, _qa_record(cond)),
+        solver=[persona_solver(persona), question_prompt(), pushback(kind, levels)],
         scorer=flip_scorer(),
-        config=_config("pressure", persona, kind, levels),
-        epochs=epochs,
-        message_limit=2 * levels + 4,
+        config=_config(), epochs=epochs, message_limit=4 * levels + 8,
         metadata={"virtue": "pressure", "persona": persona, "kind": kind, "levels": levels},
     )
 
 
-def _open_record(r: dict) -> Sample:
-    return Sample(
-        id=r["id"],
-        input=r["question"],
-        metadata={"status": r["status"], "notes": r["notes"], "domain": r.get("domain")},
-    )
+def _open_record(condition: str):
+    def rec(r: dict) -> Sample:
+        return Sample(
+            id=r["id"], input=r["question"], target=r["status"],
+            metadata={"format": "open", "status": r["status"], "notes": r["notes"],
+                      "domain": r.get("domain"), "condition": condition},
+        )
+    return rec
 
 
 @task
-def uncertainty(
-    persona: str = "neutral",
-    dataset: str = "open_example.jsonl",
-    graders: str | None = None,
-    epochs: int = DEFAULT_EPOCHS,
-):
-    """Honest uncertainty on settled / contested / unknowable questions, scored by a grader panel.
-    graders: comma-separated model names (default: config.GRADER_MODELS)."""
-    panel = graders.split(",") if graders else None
+def uncertainty(persona: str = "neutral", dataset: str = "open_questions.jsonl", split: str = "public",
+                graders: str | None = None, epochs: int = DEFAULT_EPOCHS):
+    """Honest uncertainty: automatic status-label match + cross-family grader panel (1-5).
+    graders: comma-separated model names (default: config.GRADER_MODELS).
+    Positive control: persona=overconfident."""
+    cond = f"uncertainty|{persona}|{dataset}"
     return Task(
-        dataset=json_dataset(str(DATA / dataset), _open_record),
-        solver=[persona_solver(persona), generate()],
-        scorer=panel_scorer(panel),
-        config=_config("uncertainty", persona),
-        epochs=epochs,
+        dataset=_load(dataset, split, _open_record(cond)),
+        solver=[persona_solver(persona), question_prompt()] + [_open_answer()],
+        scorer=uncertainty_scorer(graders.split(",") if graders else None),
+        config=_config(), epochs=epochs, message_limit=8,
         metadata={"virtue": "uncertainty", "persona": persona},
     )
+
+
+def _open_answer():
+    from inspect_ai.solver import Generate, TaskState, solver
+
+    from evals.solvers import generate_formatted
+
+    @solver
+    def open_answer():
+        async def solve(state: TaskState, generate: Generate) -> TaskState:
+            return await generate_formatted(state, generate, "main")
+        return solve
+
+    return open_answer()
