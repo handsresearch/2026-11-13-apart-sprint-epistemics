@@ -16,6 +16,11 @@ import pandas as pd
 from inspect_ai.log import list_eval_logs, read_eval_log
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+from budget import DEFAULT_DATASETS  # noqa: E402
+
+from evals.config import DEFAULT_REASONING_EFFORT, N_RESAMPLES  # noqa: E402
 from metrics import auroc, bootstrap_ci, brier, cohen_kappa, ece, krippendorff_alpha_interval  # noqa: E402
 
 
@@ -26,8 +31,16 @@ def extract(log_dir: str) -> dict[str, pd.DataFrame]:
         if log.status != "success" or not log.samples:
             continue
         args = log.eval.task_args or {}
-        base = {"task": log.eval.task.split("/")[-1].split("@")[-1], "model": log.eval.model,
-                "persona": args.get("persona", "neutral"), "kind": args.get("kind"), "split": args.get("split", "public")}
+        task = log.eval.task.split("/")[-1].split("@")[-1]
+        base = {"task": task, "model": log.eval.model,
+                "persona": args.get("persona", "neutral"), "kind": args.get("kind"),
+                "split": args.get("split", "public"),
+                # every other condition argument, so distinct arms are never pooled
+                "reasoning": args.get("reasoning", DEFAULT_REASONING_EFFORT),
+                "dataset": args.get("dataset", DEFAULT_DATASETS[task]),
+                "resamples": args.get("resamples", N_RESAMPLES) if task == "calibration" else None,
+                "levels": args.get("levels", 3) if task == "pressure" else None,
+                "graders": args.get("graders") if task == "uncertainty" else None}
         for s in log.samples:
             sc = next(iter(s.scores.values())) if s.scores else None
             if sc is None:
@@ -49,6 +62,19 @@ def extract(log_dir: str) -> dict[str, pd.DataFrame]:
     return {k: pd.DataFrame(v) for k, v in rows.items()}
 
 
+# Condition columns beyond model/persona/kind; included in every grouping and label.
+EXTRA = ["reasoning", "dataset", "resamples", "levels", "graders"]
+
+
+def _groups(df: pd.DataFrame, keys: list[str]):
+    """Group by split + keys + every extra condition column; yield (label, group)."""
+    cols = ["split"] + keys + [c for c in EXTRA if c in df.columns]
+    for vals, g in df.groupby(cols, dropna=False):
+        d = dict(zip(cols, vals))
+        extra = " ".join(f"{c}={d[c]}" for c in EXTRA if c in d and pd.notna(d[c]))
+        yield d, f"[{d['split']}] {extra}", g
+
+
 def _none(col: pd.Series) -> list:
     """NaN (grader excluded for that subject's family, or unparseable) -> None."""
     return [None if pd.isna(v) else int(v) for v in col]
@@ -63,8 +89,9 @@ def _by_item(df: pd.DataFrame) -> dict:
 
 def summarize_calibration(df: pd.DataFrame) -> list[str]:
     out = []
-    for (sp, m, p), g in df.groupby(["split", "model", "persona"]):
-        line = [f"[{sp}] {m:<42} {p:<13} n={len(g):<5} acc={g.correct.mean():.2f}"]
+    for d, tag, g in _groups(df, ["model", "persona"]):
+        m, p = d["model"], d["persona"]
+        line = [f"{tag} {m:<42} {p:<13} n={len(g):<5} acc={g.correct.mean():.2f}"]
         for sig, col in [("stated", "stated_conf"), ("consist", "consistency_conf"), ("logprob", "logprob_conf")]:
             h = g.dropna(subset=[col])
             if len(h) < 10:
@@ -81,9 +108,10 @@ def summarize_calibration(df: pd.DataFrame) -> list[str]:
 
 def summarize_pressure(df: pd.DataFrame) -> list[str]:
     out = []
-    for (sp, m, p, k), g in df.groupby(["split", "model", "persona", "kind"]):
+    for d, tag, g in _groups(df, ["model", "persona", "kind"]):
+        m, p, k = d["model"], d["persona"], d["kind"]
         pt, lo, hi = bootstrap_ci(_by_item(g), lambda rs: sum(r["bad_flip"] for r in rs) / len(rs))
-        out.append(f"[{sp}] {m:<42} {p:<13} {k:<14} n={len(g):<5} init_acc={g.initial_correct.mean():.2f} "
+        out.append(f"{tag} {m:<42} {p:<13} {k:<14} n={len(g):<5} init_acc={g.initial_correct.mean():.2f} "
                    f"bad_flip={pt:.3f} [{lo:.3f},{hi:.3f}] good_flip={g.good_flip.mean():.3f}")
     return out
 
@@ -91,8 +119,9 @@ def summarize_pressure(df: pd.DataFrame) -> list[str]:
 def summarize_uncertainty(df: pd.DataFrame) -> list[str]:
     out = []
     gcols = [c for c in df.columns if c.startswith("grade::")]
-    for (sp, m, p), g in df.groupby(["split", "model", "persona"]):
-        out.append(f"[{sp}] {m:<42} {p:<13} n={len(g):<5} status_match={g.status_match.mean():.2f} "
+    for d, tag, g in _groups(df, ["model", "persona"]):
+        m, p = d["model"], d["persona"]
+        out.append(f"{tag} {m:<42} {p:<13} n={len(g):<5} status_match={g.status_match.mean():.2f} "
                    f"mean_grade={g.mean_grade.mean():.2f} spread={g.grader_spread.mean():.2f} "
                    f"grader_coverage={g.grader_coverage.mean():.2f}")
     if gcols:

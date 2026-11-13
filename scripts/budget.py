@@ -78,6 +78,14 @@ def items_for(task: str, args: dict) -> int:
     return sum(1 for f in files for line in f.read_text().splitlines() if line.strip())
 
 
+def effective_graders(entry: dict) -> list[str] | None:
+    """Same precedence as run_plan.py: top-level `graders`, then `args.graders`, else None (= default panel)."""
+    g = entry.get("graders") or (entry.get("args") or {}).get("graders")
+    if isinstance(g, str):
+        g = [x.strip() for x in g.split(",") if x.strip()]
+    return g or None
+
+
 def estimate(plan: dict, prices: dict, n_items: dict | None = None) -> tuple[float, list[dict]]:
     """Cost = items x epochs x calls_per_sample x (in x price_in + out x price_out) + graders.
     Items and the grader panel are resolved exactly as the run resolves them (the entry's
@@ -92,7 +100,7 @@ def estimate(plan: dict, prices: dict, n_items: dict | None = None) -> tuple[flo
         n = min(r.get("limit") or items, items) * r.get("epochs", 1)
         pin, pout = price(r["model"], prices)
         cost = n * t["calls_per_sample"] * (t["in"] * pin + t["out"] * pout)
-        panel = graders_for(r["model"], r.get("graders") or GRADER_MODELS) if r["task"] == "uncertainty" else []
+        panel = graders_for(r["model"], effective_graders(r) or GRADER_MODELS) if r["task"] == "uncertainty" else []
         for g in panel:
             gin, gout = price(g, prices)
             cost += n * (t.get("grader_in", 900) * gin + t.get("grader_out", 500) * gout)

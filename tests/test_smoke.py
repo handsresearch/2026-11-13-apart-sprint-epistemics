@@ -115,3 +115,33 @@ def test_budget_prices_split_and_default_panel():
     total, rows = estimate(plan, prices)
     # 2 subject calls + 2 samples x 2 eligible default graders (OpenAI grader excluded) = 6 calls
     assert abs(total - 6 * 200e-6) < 1e-12
+
+
+def test_budget_prices_grader_override_in_args():
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+    from budget import estimate
+    prices = {"openai/gpt-5.6-luna": (1e-6, 1e-6), "anthropic/claude-sonnet-5.5": (1e-5, 1e-5)}
+    tok = {"calls_per_sample": 1, "in": 100, "out": 100, "grader_in": 100, "grader_out": 100}
+    plan = {"runs": [{"task": "uncertainty", "models": ["openrouter/openai/gpt-5.6-luna"], "limit": 1, "epochs": 1,
+                      "args": {"graders": "anthropic/claude-sonnet-5-5"}, "tokens": tok}]}
+    total, _ = estimate(plan, prices)
+    assert abs(total - (200e-6 + 200e-5)) < 1e-12   # the expensive override is priced, not the default panel
+
+
+def test_summary_keeps_condition_args_apart(tmp_path, monkeypatch):
+    import sys
+    from pathlib import Path
+    import evals.tasks as T
+    from inspect_ai import eval as inspect_eval
+    _fixture_data(tmp_path / "data")
+    monkeypatch.setattr(T, "DATA", tmp_path / "data")
+    logs = tmp_path / "logs"
+    inspect_eval([T.calibration(epochs=1, resamples=1, reasoning="low"),
+                  T.calibration(epochs=1, resamples=1, reasoning="medium")],
+                 model="mockllm/model", log_dir=str(logs), display="none")
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "analysis"))
+    from summarize import summarize_calibration, extract
+    lines = summarize_calibration(extract(str(logs))["calibration"])
+    assert len(lines) == 2 and any("reasoning=low" in x for x in lines) and any("reasoning=medium" in x for x in lines)
