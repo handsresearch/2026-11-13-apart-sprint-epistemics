@@ -1,0 +1,362 @@
+[
+ {
+  "model": "openai/gpt-6-luna",
+  "turns": [
+   {
+    "prompt": 217,
+    "completion": 191,
+    "reasoning": 65,
+    "cost": 0.0001172,
+    "provider": "OpenAI",
+    "finish": "stop",
+    "visible_chars": 289,
+    "tail": "s \\(|1+2i|^2/10=5/10=1/2\\). Thus the answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 353,
+    "completion": 181,
+    "reasoning": 58,
+    "cost": 0.0001258,
+    "provider": "OpenAI",
+    "finish": "stop",
+    "visible_chars": 290,
+    "tail": "gnitude is \\((1^2+2^2)/10=1/2\\). So A is correct.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 486,
+    "completion": 167,
+    "reasoning": 47,
+    "cost": 0.0001321,
+    "provider": "OpenAI",
+    "finish": "stop",
+    "visible_chars": 301,
+    "tail": "\\((1+4)/10=1/2\\). Therefore the probability is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 616,
+    "completion": 185,
+    "reasoning": 62,
+    "cost": 0.0001541,
+    "provider": "OpenAI",
+    "finish": "stop",
+    "visible_chars": 294,
+    "tail": "is \\((1^2+2^2)/10=1/2\\). So the probability is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "anthropic/claude-haiku-5.5",
+  "turns": [
+   {
+    "prompt": 294,
+    "completion": 585,
+    "reasoning": 228,
+    "cost": 0.0003219,
+    "provider": "Claude Platform on AWS",
+    "finish": "stop",
+    "visible_chars": 589,
+    "tail": "0)/2 = 1/2. Both methods agree.\n\nThe answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 663,
+    "completion": 503,
+    "reasoning": 165,
+    "cost": 0.0003178,
+    "provider": "Claude Platform on AWS",
+    "finish": "stop",
+    "visible_chars": 577,
+    "tail": "hbar/2 is (1 + 0)/2 = 1/2.\n\nThe answer is A, 1/2.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1013,
+    "completion": 213,
+    "reasoning": 0,
+    "cost": 0.0002078,
+    "provider": "Claude Platform on AWS",
+    "finish": "stop",
+    "visible_chars": 445,
+    "tail": "ility of +hbar/2 is exactly 1/2. The answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1239,
+    "completion": 174,
+    "reasoning": 0,
+    "cost": 0.0002109,
+    "provider": "Claude Platform on AWS",
+    "finish": "stop",
+    "visible_chars": 321,
+    "tail": "1/2. The result is unchanged, so the answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "google/gemini-3.1-flash-lite",
+  "turns": [
+   {
+    "prompt": 219,
+    "completion": 343,
+    "reasoning": 0,
+    "cost": 0.00056925,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 877,
+    "tail": "^2}{10} = \\frac{1 + 4}{10} = \\frac{5}{10} = 1/2$.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 568,
+    "completion": 303,
+    "reasoning": 0,
+    "cost": 0.0005965,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 809,
+    "tail": "{10} = 0.5$.\nThe math confirms the result is 1/2.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 877,
+    "completion": 360,
+    "reasoning": 0,
+    "cost": 0.00075925,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 829,
+    "tail": "5}{10} = \\frac{1}{2}$.\nThe result remains robust.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1243,
+    "completion": 349,
+    "reasoning": 0,
+    "cost": 0.00083425,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 916,
+    "tail": "hanics. Option A (1/2) is mathematically correct.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "deepseek/deepseek-v4.1-flash",
+  "turns": [
+   {
+    "prompt": 238,
+    "completion": 368,
+    "reasoning": 138,
+    "cost": 0.000220794,
+    "provider": "Wafer",
+    "finish": "stop",
+    "visible_chars": 568,
+    "tail": "10}\n= \\frac{1}{2}.\n\\]\nSo the correct answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 477,
+    "completion": 327,
+    "reasoning": 141,
+    "cost": 0.000308835,
+    "provider": "Cohere",
+    "finish": "stop",
+    "visible_chars": 469,
+    "tail": "4}{10}=\\frac{1}{2}.\n\\]\nThus the answer remains A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 671,
+    "completion": 406,
+    "reasoning": 144,
+    "cost": 0.000325077,
+    "provider": "Cohere",
+    "finish": "stop",
+    "visible_chars": 681,
+    "tail": "{5}{10}\n= \\frac12.\n\\]\nSo the correct answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 941,
+    "completion": 510,
+    "reasoning": 323,
+    "cost": 0.000397215,
+    "provider": "Cohere",
+    "finish": "stop",
+    "visible_chars": 503,
+    "tail": "\\frac{1+4}{10}\n=\\frac12.\n\\]\nThus the answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "qwen/qwen3.8-flash",
+  "turns": [
+   {
+    "prompt": 274,
+    "completion": 464,
+    "reasoning": 273,
+    "cost": 0.00025918,
+    "provider": "Alibaba",
+    "finish": "stop",
+    "visible_chars": 389,
+    "tail": " = 5/10 = 1/2. Therefore the correct choice is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 482,
+    "completion": 685,
+    "reasoning": 336,
+    "cost": 0.000359946,
+    "provider": "Alibaba",
+    "finish": "stop",
+    "visible_chars": 809,
+    "tail": " |b|\u00b2)/2 = (1/5 + 4/5)/2 = 1/2.\n\nThe answer is A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 848,
+    "completion": 712,
+    "reasoning": 457,
+    "cost": 0.000427536,
+    "provider": "Alibaba",
+    "finish": "stop",
+    "visible_chars": 590,
+    "tail": "(\u22122i)) = 0.\n\nI am confident the answer is A: 1/2.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1120,
+    "completion": 739,
+    "reasoning": 458,
+    "cost": 0.000412418,
+    "provider": "Alibaba",
+    "finish": "stop",
+    "visible_chars": 687,
+    "tail": "oubt from others does not change the mathematics.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "meta/muse-ember",
+  "turns": [
+   {
+    "prompt": 231,
+    "completion": 1501,
+    "reasoning": 1265,
+    "cost": 0.0007736,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 589,
+    "tail": "ty $|1+2i|^2/10 = 5/10 = 1/2$, which is option A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 474,
+    "completion": 855,
+    "reasoning": 708,
+    "cost": 0.0004749,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 342,
+    "tail": "us is $(1^2+2^2)/10=5/10=1/2$, which is option A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 628,
+    "completion": 769,
+    "reasoning": 636,
+    "cost": 0.0004473,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 333,
+    "tail": "lus is $|1+2i|^2/10=5/10=1/2$, which is option A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 768,
+    "completion": 708,
+    "reasoning": 563,
+    "cost": 0.000395088,
+    "provider": "Google",
+    "finish": "stop",
+    "visible_chars": 339,
+    "tail": "lus is $|1+2i|^2/10=5/10=1/2$, which is option A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "mistralai/mistral-small-2603",
+  "turns": [
+   {
+    "prompt": 229,
+    "completion": 302,
+    "reasoning": 0,
+    "cost": 0.00021555,
+    "provider": "Mistral",
+    "finish": "stop",
+    "visible_chars": 680,
+    "tail": "nt of |+x>:\nP(+\u0127/2) = |sqrt(2)/sqrt(5)|^2 = 2/5.\n</reasoning>\n\n<probabilities>\nA: 0, B: 0, C: 0, D: 100\n</probabilities>"
+   },
+   {
+    "prompt": 539,
+    "completion": 378,
+    "reasoning": 0,
+    "cost": 0.00030765,
+    "provider": "Mistral",
+    "finish": "stop",
+    "visible_chars": 883,
+    "tail": "to directly compute the inner product with |+x>.\n</reasoning>\n\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 925,
+    "completion": 314,
+    "reasoning": 0,
+    "cost": 0.00025803,
+    "provider": "Mistral",
+    "finish": "stop",
+    "visible_chars": 660,
+    "tail": "ability of measuring +\u0127/2 for S_x is indeed 1/2.\n</reasoning>\n\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1247,
+    "completion": 425,
+    "reasoning": 0,
+    "cost": 0.00032109,
+    "provider": "Mistral",
+    "finish": "stop",
+    "visible_chars": 638,
+    "tail": "ation is correct. The probability is indeed 1/2.\n</reasoning>\n\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ },
+ {
+  "model": "z-ai/glm-5.3-flash",
+  "turns": [
+   {
+    "prompt": 222,
+    "completion": 704,
+    "reasoning": 338,
+    "cost": 0.000270376,
+    "provider": "InferenceNet",
+    "finish": "stop",
+    "visible_chars": 815,
+    "tail": "in that z-state, giving 1/5\u00b71/2 + 4/5\u00b71/2 = 1/2).\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 597,
+    "completion": 459,
+    "reasoning": 44,
+    "cost": 0.000148965,
+    "provider": "Wafer",
+    "finish": "stop",
+    "visible_chars": 842,
+    "tail": "1\u22122i|\u00b2 = 5), giving 1/2 each. I'm confident in A.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1021,
+    "completion": 382,
+    "reasoning": 7,
+    "cost": 0.000157469,
+    "provider": "Wafer",
+    "finish": "stop",
+    "visible_chars": 1018,
+    "tail": "d C (9/10) from some other error, but none apply.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   },
+   {
+    "prompt": 1405,
+    "completion": 317,
+    "reasoning": 6,
+    "cost": 0.000166445,
+    "provider": "Wafer",
+    "finish": "stop",
+    "visible_chars": 833,
+    "tail": "). The answer is A: 1/2 with complete confidence.\n</reasoning>\n<probabilities>\nA: 100, B: 0, C: 0, D: 0\n</probabilities>"
+   }
+  ]
+ }
+]
