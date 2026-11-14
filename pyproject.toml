@@ -1,0 +1,25 @@
+[project]
+name = "fliprate"
+version = "0.1.0"
+description = "FlipRate: measuring how model answers and confidence change under repeated pushback (Inspect eval)"
+requires-python = ">=3.11"
+dependencies = [
+    "inspect-ai==0.3.289",
+    "anthropic==2.8.0",
+    "openai==3.51.0",   # used by Inspect's OpenRouter provider
+    "python-dotenv",
+    "pyyaml",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["fliprate"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
