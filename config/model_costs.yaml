@@ -1,0 +1,35 @@
+# Model prices in USD per million tokens, read by Inspect (`model_cost_config`).
+# Inspect 0.3.289 ships no prices for current models, and it refuses to run with a
+# cost_limit when a model's price is missing, so add a model here before using it.
+#
+# Source: Anthropic first-party API prices, as listed in the Claude API reference on 2026-11-03.
+# Cache writes are the 5-minute rate (1.25x input); Inspect adjusts 1-hour writes itself.
+# Haiku 5.5 costs more for prompts over 100K tokens ($0.50 / $2.50); our prompts are far shorter.
+# Thinking tokens are billed as output tokens.
+
+anthropic/claude-haiku-5-5:
+  input: 0.10
+  output: 0.50
+  input_cache_write: 0.125
+  input_cache_read: 0.01
+
+anthropic/claude-sonnet-5-5:
+  input: 2.00
+  output: 10.00
+  input_cache_write: 2.50
+  input_cache_read: 0.10
+
+anthropic/claude-opus-5-5:
+  input: 4.00
+  output: 20.00
+  input_cache_write: 5.00
+  input_cache_read: 0.20
+
+anthropic/claude-haiku-4-5:
+  input: 1.00
+  output: 5.00
+  input_cache_write: 1.25
+  input_cache_read: 0.10
+
+# OpenRouter models (openrouter/<vendor>/<model>): add them with prices copied from
+# their OpenRouter model page on the day we use them.
