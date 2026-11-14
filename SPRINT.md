@@ -68,4 +68,4 @@ Results come 1–2 weeks after judging, and feedback arrives by email.
 - [ ] Both of us sign up on the sprint page (online, or pick a hub as the location).
 - [ ] Join the Apart Discord.
 - [ ] Copy the report template from the Guidelines tab.
-- [ ] Pick 1–2 ideas from IDEAS.md and get API keys and a budget cap ready.
+- [ ] Pick 1–2 ideas of our own and get API keys and a budget cap ready.

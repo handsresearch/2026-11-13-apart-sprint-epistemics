@@ -5,7 +5,7 @@ Shared instructions for AI coding agents (Codex, Claude Code via CLAUDE.md, Copi
 ## Project
 
 Two-person weekend research project for the Apart Research AI x Epistemics Research Sprint (13–15 Nov 2026, online).
-See SPRINT.md for the sprint summary, submission requirements and scoring criteria, and IDEAS.md for the candidate projects.
+See SPRINT.md for the sprint summary, submission requirements and scoring criteria. Earlier work (the epistemic virtue prototype) is archived in archive/epistemic-virtue-prototype-1/; leave it untouched unless asked.
 Experiments should run on a 16 GB laptop without a GPU, with a total API budget of roughly $20–120.
 
 ## Spending Approval
