@@ -42,23 +42,34 @@ Our main contributions are:
 
 ## 2. Related Work
 
-<!--
-TODO: Expand into prose. Points agreed so far. Paper explainers are in docs/papers/ (PR #13). Check each claim against the papers themselves before submitting; made-up results or references can get a project disqualified.
+<!-- TODO: Check each claim below against the papers themselves (not only our explainers in docs/papers/) before submitting; made-up results or references can get a project disqualified. Numbers from our own runs come from PRs #15 and #16 and must match the final results tables. Shorten if the page budget is tight. -->
 
-- SycEval (Fanous et al., 2025): escalating rebuttals (simple, ethos, justification, citation), but each strength is a separate single-rebuttal query, not escalation within one chat. Scores right/wrong only (progressive vs regressive sycophancy). No re-ask control. Its rebuttals include reasons and citations, so they are not content-free pressure.
-- FlipFlop / "Are You Sure?" (Laban et al., 2023): a single challenge after the first answer; reports flips and accuracy drop. Closest to our "Are you sure?" arm, but one turn and no confidence over options.
-- ELEPHANT (Cheng et al., 2025): social sycophancy; includes a both-sides test (does the model side with whichever party asks). Relates to our speaker-order design in Experiment 2.
-- MASK (Ren et al., 2025): separates a model's belief from its statement under pressure. Our stated probabilities are statements, not beliefs (see Limitations).
-- Optional: Sharma et al. (2023), "Towards Understanding Sycophancy in Language Models".
+Several studies have already asked whether chatbots give in when a user pushes back. FlipRate builds on them, but it asks a narrower question and measures it more finely. This section explains what the closest studies did and what is different in ours.
 
-What FlipRate adds:
-1. Probabilities over all four options at every turn, so movement that does not flip the top answer is visible.
-2. A neutral re-ask control.
-3. Escalation within one conversation (multi-turn), including a new escalation arm: one user, one wrong option, stronger wording each turn, no reasons.
-4. Speaker-order effects with users of stated reliability, compared with a Bayesian posterior that is the same in every order (Experiment 2).
+**"Are You Sure?" (FlipFlop; Laban et al., 2023)** is the closest study to our Experiment 1. The model answers a question, the user says something like "Are you sure?", and the authors check whether the answer changes. Across ten models from 2023, answers flipped 46% of the time, and accuracy fell by 17 points on average. Our "Are you sure?" condition copies this idea, but differs in five ways:
 
-Template prompts to answer: when would someone use our method over existing ones, and what information does it give that we did not have before?
--->
+1. **One push versus several.** FlipFlop challenges the model once. We push three times in a row, so we can see whether the model holds firm, gives in at once, or slowly drifts.
+2. **No comparison condition versus a "just ask again" control.** FlipFlop measures how accuracy changes after the challenge, and counts flips separately for right and wrong first answers. But it has no condition without a challenge, so it cannot tell how much of the change comes from the challenge and how much from simply answering a second time. We therefore also ask the same question again in a neutral way ("Please give your reasoning and probabilities again") and only count movement beyond that. This matters: Mistral Small 4 changed its top answer in 7% of conversations when we just asked again, before any pressure.
+3. **Right-or-wrong versus how sure.** FlipFlop records only the chosen answer. A model that goes from 95% sure to 55% sure but keeps its answer looks perfectly steady. We ask for a probability for every option at every turn, so we see these smaller shifts too.
+4. **Doubt only versus a pushed wrong answer.** FlipFlop's users only express doubt. We add a user who names a specific wrong answer and says it more forcefully each time, without giving any reason.
+5. **One user versus several users of known reliability.** FlipFlop varies the wording of the challenge (some versions claim a PhD), but the model is never told how reliable the person is. In our Experiment 2, three people of stated reliability (a novice, a student and a professor) give their answers. Because their reliability is known, we can compute how far a careful reasoner should move, and check whether the order in which they speak changes the model's final answer.
+
+Our results are also much milder than FlipFlop's. On our medical questions, "Are you sure?" changed the top answer in about 2% to 6% of conversations for six of seven current models, and in 24% for Mistral Small 4. In our first run, accuracy did not change on average: answers went from right to wrong about as often as from wrong to right. <!-- TODO: confirm the final rerun numbers, and check accuracy before and after in the rerun. Newer models and a different task make this a different setting, not a contradiction of FlipFlop. -->
+
+**SycEval (Fanous et al., 2025)** tests stronger rebuttals on maths and medical questions: a plain "you're wrong", then the same plus an appeal to authority, a reason, and a (made-up) citation. Each strength is tried in its own conversation, starting from the model's first answer, so a model never faces a growing series of rebuttals within one chat. Its rebuttals also carry content (reasons and citations), so giving in can be partly reasonable. Like FlipFlop, it scores only right versus wrong and has no "just ask again" control. Its useful split between changes that fix a wrong answer and changes that break a right one carries over to our analysis. In contrast, our escalation condition stays in one conversation and gives no reasons at all, so any movement towards the user is unwarranted.
+
+**ELEPHANT (Cheng et al., 2025)** studies social sycophancy in advice, where there is often no single right answer. One of its tests tells the same conflict from each side and checks whether the model simply agrees with whoever is telling it. Our Experiment 2 asks the same kind of question for factual answers: does the model side with whoever spoke last, rather than with whoever is most reliable?
+
+**MASK (Ren et al., 2025)** separates what a model believes (what it says when nobody is pushing) from what it says under pressure. Our "just ask again" condition plays a similar role as the no-pressure reference. MASK also infers belief from what the model writes, but it checks that belief with repeated neutral questions and related questions. We do not run such a check, so a shift in a model's stated probabilities need not mean a change in what it believes (see Limitations).
+
+**In short,** FlipRate adds four things to this work:
+
+1. Probabilities for every option at every turn, so shifts that do not change the top answer are visible.
+2. A neutral "just ask again" control, so pressure is measured against the movement a model shows when nobody pushes.
+3. Several pushes within one conversation, including a user who pushes a wrong answer ever more forcefully without reasons.
+4. A test with users of known reliability in different orders, compared with a correct answer that does not depend on the order (the Bayesian update).
+
+<!-- TODO: Optionally cite Sharma et al. (2023), "Towards Understanding Sycophancy in Language Models", in one sentence as general background on sycophancy. -->
 
 ## 3. Methods
 
