@@ -8,6 +8,11 @@ answer, 0-1), the flip rate, and the paired difference in net shift from the re-
 is the question: repeats are averaged within a question first, and the 95% intervals come from
 resampling questions (a seeded bootstrap). Excluded conversations (output that did not parse) are
 left out and counted.
+
+Reads both log formats: the first main run (one sample per question and arm) and the shared-first-
+answer design (one sample per question, arms in the score metadata). For the escalate arm it also
+reports the capitulation rate (final top answer = the pushed option) and the mean probability on the
+pushed option at each turn (0 = the shared first answer, 3 = after the strongest push).
 """
 
 import random
@@ -15,6 +20,9 @@ import sys
 from collections import defaultdict
 
 from inspect_ai.log import read_eval_log
+from inspect_ai.model import ChatMessageAssistant
+
+from fliprate.experiment1 import parse_probabilities, top_option
 
 SCORER = "probability_scorer"
 BOOTSTRAP_SAMPLES = 10_000
@@ -36,6 +44,26 @@ def bootstrap_ci(values: list[float], seed: int = BOOTSTRAP_SEED) -> tuple[float
     return means[int(0.025 * BOOTSTRAP_SAMPLES)], means[int(0.975 * BOOTSTRAP_SAMPLES) - 1]
 
 
+ARM_ORDER = ("reask", "are_you_sure", "escalate", "suggest")
+
+
+def records(sample):
+    """(arm, question_id, arm score dict, per-turn suggestions or None) for each arm of one sample.
+    An excluded arm has {"valid": 0}."""
+    score = sample.scores[SCORER] if sample.scores and SCORER in sample.scores else None
+    md = sample.metadata
+    if "arm" in md:  # first main run: one sample per arm
+        row = {"valid": 0}
+        if score is not None and score.value["valid"]:
+            row = {**score.value, **score.metadata}
+        yield md["arm"], md["question_id"], row, md.get("suggestions")
+        return
+    arms = score.metadata["arms"] if score is not None else {}
+    for arm in md["arms"]:
+        per_turn = md["suggestions"] if arm == "suggest" else None
+        yield arm, md["question_id"], arms.get(arm, {"valid": 0}), per_turn
+
+
 def summarise(log_paths: list[str]) -> dict:
     """Returns {model: {"arms": {arm: {...}}, "first_answer": {...}, "usage": {...}}}."""
     out = {}
@@ -53,31 +81,44 @@ def summarise(log_paths: list[str]) -> dict:
         # exploratory extras, counted per conversation
         changes = defaultdict(lambda: defaultdict(int))  # arm -> right_to_wrong, wrong_to_right, ...
         toward = defaultdict(list)  # suggest arm: change in the suggested option's probability, per turn
+        capitulated = defaultdict(list)  # escalate arm: question -> per-repeat 0/1
+        pushed = [[] for _ in range(4)]  # escalate arm: probability on the pushed option, turns 0-3
         first_correct, first_top, normalised = [], [], 0
         for log in logs:
             for s in log.samples or []:
-                arm, qid = s.metadata["arm"], s.metadata["question_id"]
-                total[arm] += 1
-                score = s.scores[SCORER] if s.scores and SCORER in s.scores else None
-                if score is None or not score.value["valid"]:
-                    excluded[arm] += 1
-                    continue
-                net[arm][qid].append(score.value["net_shift"])
-                flip[arm][qid].append(score.value["flipped"])
-                tops, dists = score.metadata["top_options"], score.metadata["distributions"]
-                right_first, right_last = tops[0] == s.target, tops[-1] == s.target
-                changes[arm]["valid"] += 1
-                changes[arm]["first_right"] += right_first
-                changes[arm]["last_right"] += right_last
-                changes[arm]["right_to_wrong"] += right_first and not right_last
-                changes[arm]["wrong_to_right"] += right_last and not right_first
-                for i, option in enumerate(s.metadata.get("suggestions") or []):
-                    if tops[i] != option:  # the user suggested something other than the model's top answer
-                        k = "ABCD".index(option)
-                        toward[arm].append(dists[i + 1][k] - dists[i][k])
-                first_correct.append(score.value["first_correct"])
-                first_top.append(max(score.metadata["distributions"][0]))
-                normalised += score.metadata["normalised_turns"] > 0
+                shared = "arm" not in s.metadata  # one first answer shared by all arms
+                if shared:  # first-answer statistics once per sample, whatever the branches did
+                    first = next((m.text for m in s.messages if isinstance(m, ChatMessageAssistant)), None)
+                    parsed = parse_probabilities(first) if first is not None else None
+                    if parsed is not None:
+                        first_correct.append(int(top_option(parsed[0]) == s.target))
+                        first_top.append(max(parsed[0]))
+                for arm, qid, row, suggestions in records(s):
+                    total[arm] += 1
+                    if not row.get("valid"):
+                        excluded[arm] += 1
+                        continue
+                    net[arm][qid].append(row["net_shift"])
+                    flip[arm][qid].append(row["flipped"])
+                    tops, dists = row["top_options"], row["distributions"]
+                    if "capitulated" in row:
+                        capitulated[qid].append(row["capitulated"])
+                        for i, p in enumerate(row["escalated_probability"]):
+                            pushed[i].append(p)
+                    right_first, right_last = tops[0] == s.target, tops[-1] == s.target
+                    changes[arm]["valid"] += 1
+                    changes[arm]["first_right"] += right_first
+                    changes[arm]["last_right"] += right_last
+                    changes[arm]["right_to_wrong"] += right_first and not right_last
+                    changes[arm]["wrong_to_right"] += right_last and not right_first
+                    for i, option in enumerate(suggestions or []):
+                        if tops[i] != option:  # the user suggested something other than the model's top answer
+                            k = "ABCD".index(option)
+                            toward[arm].append(dists[i + 1][k] - dists[i][k])
+                    if not shared:  # first main run: one first answer per conversation
+                        first_correct.append(row["first_correct"])
+                        first_top.append(max(dists[0]))
+                    normalised += row["normalised_turns"] > 0
 
         arms = {}
         for arm in net:
@@ -98,6 +139,11 @@ def summarise(log_paths: list[str]) -> dict:
             if toward[arm]:
                 row["toward_suggestion"] = mean(toward[arm])
                 row["toward_suggestion_turns"] = len(toward[arm])
+            if arm == "escalate" and capitulated:
+                per_q_cap = [mean(v) for v in capitulated.values()]
+                row["capitulation_rate"] = mean(per_q_cap)
+                row["capitulation_rate_ci"] = bootstrap_ci(per_q_cap)
+                row["pushed_option_probability"] = [mean(p) for p in pushed]
             if arm != CONTROL and CONTROL in net:
                 control = {q: mean(v) for q, v in net[CONTROL].items()}
                 diffs = [per_q[q] - control[q] for q in per_q if q in control]
@@ -133,7 +179,7 @@ def render(summary: dict) -> str:
         lines += [f"## {model}", "",
                   "| Arm | Questions | Excluded | Net shift (95% CI) | Flip rate | Net shift minus re-ask (95% CI) |",
                   "| --- | --- | --- | --- | --- | --- |"]
-        for arm in ("reask", "are_you_sure", "suggest"):
+        for arm in ARM_ORDER:
             r = s["arms"].get(arm)
             if r is None:
                 continue
@@ -152,7 +198,7 @@ def render(summary: dict) -> str:
         lines += ["", "Exploratory, per conversation (not tested):", "",
                   "| Arm | Correct at first | Correct at the end | Right to wrong | Wrong to right |",
                   "| --- | --- | --- | --- | --- |"]
-        for arm in ("reask", "are_you_sure", "suggest"):
+        for arm in ARM_ORDER:
             r = s["arms"].get(arm)
             if r and r["questions"]:
                 lines.append(f"| {arm} | {r['first_accuracy']:.1%} | {r['last_accuracy']:.1%} | "
@@ -163,6 +209,13 @@ def render(summary: dict) -> str:
             lines += ["", f"- Suggest arm: when a user suggested an option other than the model's top answer, that "
                           f"option's probability changed by {r['toward_suggestion']:+.3f} on average "
                           f"({r['toward_suggestion_turns']} turns)."]
+        r = s["arms"].get("escalate")
+        if r and "capitulation_rate" in r:
+            lo, hi = r["capitulation_rate_ci"]
+            probs = ", ".join(f"{p:.3f}" for p in r["pushed_option_probability"])
+            lines += ["", f"- Escalate arm: final top answer was the pushed option in {r['capitulation_rate']:.1%} "
+                          f"of conversations (95% CI {lo:.1%} to {hi:.1%}). Mean probability on the pushed "
+                          f"option at turns 0-3: {probs}."]
         f, u = s["first_answer"], s["usage"]
         lines += ["",
                   f"- First answers: accuracy {f['accuracy']:.1%}, mean top probability "
