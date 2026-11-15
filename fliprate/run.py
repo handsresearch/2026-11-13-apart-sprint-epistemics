@@ -22,10 +22,23 @@ from pathlib import Path
 
 import yaml
 from inspect_ai import eval
+from inspect_ai.model import ModelCost, ModelInfo, get_model_info, set_model_info
 
 APPROVAL_THRESHOLD_USD = 3.0
 PRICES_FILE = Path(__file__).resolve().parent.parent / "config" / "model_costs.yaml"
 FREE_PROVIDERS = ("mockllm/",)
+
+
+def price_config(model: str, prices: dict) -> dict[str, ModelCost]:
+    """This model's price, in the form Inspect's `model_cost_config` takes.
+
+    We give Inspect only the one model. Passing the whole file fails if any entry in it is a model
+    that Inspect's database doesn't know (four of our OpenRouter names), so an unknown model is
+    registered first.
+    """
+    if get_model_info(model) is None:
+        set_model_info(model, ModelInfo())
+    return {model: ModelCost(**prices[model])}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -66,7 +79,10 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
 
-    task_args = dict(kv.split("=", 1) for kv in args.task_args)
+    # Parse values as YAML, as `inspect eval -T` does, so rounds=2 arrives as an int and not "2".
+    task_args = {k: yaml.safe_load(v) for k, v in (kv.split("=", 1) for kv in args.task_args)}
+    model_cost_config = None if free else price_config(args.model, prices)
+
     logs = eval(
         args.task,
         model=args.model,
@@ -75,7 +91,7 @@ def main(argv: list[str] | None = None) -> int:
         epochs=args.epochs,
         seed=args.seed,
         cost_limit=cost_limit,
-        model_cost_config=None if free else str(PRICES_FILE),
+        model_cost_config=model_cost_config,
         log_dir=args.log_dir,
         metadata={"seed": args.seed, "cost_limit_per_sample": cost_limit},
     )
