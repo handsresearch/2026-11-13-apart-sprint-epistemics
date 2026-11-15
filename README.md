@@ -14,7 +14,7 @@ An [Inspect](https://inspect.aisi.org.uk/) eval of whether a model changes its a
 
 **Start here:** [docs/results.html](docs/results.html) explains the experiment and the results so far on one page. Open it in a browser.
 
-**Status on 15 Nov 2026:** Experiment 1 is built and piloted. The first question set (MedQA) was too easy, and a harder one (MedXpertQA, cut to four options) passed the check. The main run and Experiment 2 are not done.
+**Status on 15 Nov 2026:** Experiment 1 is done: 100 MedXpertQA questions, three conversation types, three repeats, on GPT-6 Luna, Claude Haiku 5.5 and Mistral Small 4. Experiment 2 is not built.
 
 | Where | What |
 | --- | --- |
@@ -26,7 +26,8 @@ An [Inspect](https://inspect.aisi.org.uk/) eval of whether a model changes its a
 | [data/](data/) | The fixed question sets and their sources |
 | [scripts/](scripts/) | Builds the question sets; measures token usage per model |
 | [tests/](tests/) | Free tests on a mock model |
-| [docs/pilot-experiment1.md](docs/pilot-experiment1.md) | The pilot and the dataset check in detail, with costs |
+| [docs/experiment1-results.md](docs/experiment1-results.md) | The main run of Experiment 1 in detail: exact numbers, commands, limits and cost |
+| [docs/pilot-experiment1.md](docs/pilot-experiment1.md) | The pilots and the dataset check that led to the question set and the models |
 | [docs/model-costs.md](docs/model-costs.md) | Candidate models, prices and cost estimates |
 | [docs/inspect-primer.md](docs/inspect-primer.md) | Inspect basics and the gotchas we hit |
 

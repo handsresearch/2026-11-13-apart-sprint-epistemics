@@ -1,6 +1,6 @@
 # Pilot of Experiment 1 and dataset check (15 Nov 2026)
 
-A one-page version in plain language is in [results.html](results.html).
+A one-page version in plain language is in [results.html](results.html). The main run that followed is in [experiment1-results.md](experiment1-results.md).
 
 **Result: the pipeline works, but MedQA is too easy for GPT-6 Luna.** The model answered 99.6% of first answers correctly with a mean confidence of 96.6%, and it barely moved under any kind of pushback. The dataset fails the plan's check (first-answer accuracy between 40% and 80%), so we need a harder question set before the main run.
 
@@ -58,17 +58,29 @@ After the pilot, `fliprate/screen.py` asked each model 30 questions from each ca
 
 - **30 questions is a small sample,** so each percentage is rough (about ±17 points). It is enough to separate 55–65% from 85–95%, which is all the check has to do.
 - **"of 21", "of 26", "of 28"** mean that the other replies never reached the probabilities, because the model used up the reply limit on thinking. GPQA and the last MedXpertQA cell ran with a limit of 8,192 tokens, the rest with 4,096.
-- **DeepSeek V4.1 Flash is a problem.** With a limit of 4,096 tokens it gave no answer on 9 of 30 MedXpertQA questions; with 8,192 it still gave none on 4 of 30, and none on 9 of 30 GPQA questions. Excluding those would drop the hardest questions for that model only. Before the main run we either set a low reasoning effort for every model, or swap DeepSeek for a model without thinking (Mistral Small 4).
+- **DeepSeek V4.1 Flash was dropped.** With a limit of 4,096 tokens it gave no answer on 9 of 30 MedXpertQA questions; with 8,192 it still gave none on 4 of 30, and none on 9 of 30 GPQA questions. Excluding those would drop the hardest questions for that model only. We replaced it with Mistral Small 4, which has no thinking. On the same check Mistral Small 4 got 43% (13 of 30) with every reply readable.
 - **The ten-option sets are cut to four options** (the correct one plus three random distractors), so they are easier than the originals.
 - **Summary data:** `docs/data/dataset-check-2026-11-15.json`. GPQA's questions are not in the repo (see data/README.md).
 
 ### Cost of the dataset check
 
-- **Inspect's count:** $0.26 for 300 calls.
-- **OpenRouter's figure for the whole day:** $0.555, against $0.43 counted by Inspect for the pilot and the check together. After the pilot the two agreed ($0.165 against $0.163), so the gap of about $0.13 comes from the check, where Claude Haiku 5.5 and DeepSeek ran for the first time. We have not found which of the two it is. Until we do, treat Inspect's cost cap as counting about 30% too little for those models.
+- **Inspect's count:** $0.27 for 330 calls, including the Mistral Small 4 check.
+- **Inspect counted less than OpenRouter billed, most likely because of DeepSeek.** After the check, OpenRouter showed about $0.59 for the day against $0.43 counted by Inspect. In the later runs, read one model at a time, the bill matched Inspect's count for GPT-6 Luna and Claude Haiku 5.5 and was below it for Mistral Small 4. DeepSeek is the only model left that can explain the gap.
 
-## What to do next
+## Second pilot: Experiment 1 on MedXpertQA
 
-1. **Agree on MedXpertQA (four options)** as the question set, and on what to do about DeepSeek's thinking.
-2. **Run a short Experiment 1 pilot on the new set** to get the cost per conversation for each model, then ask for approval for the main run (100 questions × 3 arms × 3 repeats × 3 models).
-3. **Experiment 2** is not built yet.
+Before the main run, the first 30 MedXpertQA questions were run in all three arms, once, on the three models (90 conversations each), to get the cost per conversation.
+
+| Model | First answers correct | Re-ask: net shift, flips | "Are you sure?": net shift, flips | Suggestion: net shift, flips | Cost per conversation |
+| --- | --- | --- | --- | --- | --- |
+| GPT-6 Luna | 53.3% | 0.083, 10.0% | 0.102, 10.0% | 0.028, 3.3% | $0.0009 |
+| Claude Haiku 5.5 | 63.3% | 0.001, 0.0% | 0.074, 10.0% | 0.061, 3.3% | $0.0017 |
+| Mistral Small 4 | 55.6% | 0.134, 3.3% | 0.261, 40.0% | 0.080, 6.7% | $0.0011 |
+
+- No conversation was excluded. This pilot cost $0.32 on OpenRouter's bill.
+- With 30 questions and one repeat these numbers are a first look only. GPT-6 Luna's re-ask shift of 0.083 came from a few conversations and was 0.006 in the main run.
+- Summary data: `docs/data/exp1-pilot-medxpert-2026-11-15.json`.
+
+## What happened next
+
+The main run on MedXpertQA (100 questions, three arms, three repeats, three models) is in [experiment1-results.md](experiment1-results.md). Experiment 2 is not built yet.

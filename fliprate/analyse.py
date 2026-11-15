@@ -50,6 +50,9 @@ def summarise(log_paths: list[str]) -> dict:
         flip = defaultdict(lambda: defaultdict(list))
         total = defaultdict(int)
         excluded = defaultdict(int)
+        # exploratory extras, counted per conversation
+        changes = defaultdict(lambda: defaultdict(int))  # arm -> right_to_wrong, wrong_to_right, ...
+        toward = defaultdict(list)  # suggest arm: change in the suggested option's probability, per turn
         first_correct, first_top, normalised = [], [], 0
         for log in logs:
             for s in log.samples or []:
@@ -61,6 +64,17 @@ def summarise(log_paths: list[str]) -> dict:
                     continue
                 net[arm][qid].append(score.value["net_shift"])
                 flip[arm][qid].append(score.value["flipped"])
+                tops, dists = score.metadata["top_options"], score.metadata["distributions"]
+                right_first, right_last = tops[0] == s.target, tops[-1] == s.target
+                changes[arm]["valid"] += 1
+                changes[arm]["first_right"] += right_first
+                changes[arm]["last_right"] += right_last
+                changes[arm]["right_to_wrong"] += right_first and not right_last
+                changes[arm]["wrong_to_right"] += right_last and not right_first
+                for i, option in enumerate(s.metadata.get("suggestions") or []):
+                    if tops[i] != option:  # the user suggested something other than the model's top answer
+                        k = "ABCD".index(option)
+                        toward[arm].append(dists[i + 1][k] - dists[i][k])
                 first_correct.append(score.value["first_correct"])
                 first_top.append(max(score.metadata["distributions"][0]))
                 normalised += score.metadata["normalised_turns"] > 0
@@ -75,7 +89,15 @@ def summarise(log_paths: list[str]) -> dict:
                 "net_shift": mean(list(per_q.values())),
                 "net_shift_ci": bootstrap_ci(list(per_q.values())),
                 "flip_rate": mean([mean(v) for v in flip[arm].values()]),
+                "valid_conversations": changes[arm]["valid"],
+                "first_accuracy": changes[arm]["first_right"] / changes[arm]["valid"],
+                "last_accuracy": changes[arm]["last_right"] / changes[arm]["valid"],
+                "right_to_wrong": changes[arm]["right_to_wrong"],
+                "wrong_to_right": changes[arm]["wrong_to_right"],
             }
+            if toward[arm]:
+                row["toward_suggestion"] = mean(toward[arm])
+                row["toward_suggestion_turns"] = len(toward[arm])
             if arm != CONTROL and CONTROL in net:
                 control = {q: mean(v) for q, v in net[CONTROL].items()}
                 diffs = [per_q[q] - control[q] for q in per_q if q in control]
@@ -127,6 +149,20 @@ def render(summary: dict) -> str:
                 f"| {arm} | {r['questions']} | {r['excluded']} of {r['conversations']} | "
                 f"{r['net_shift']:.3f} ({lo:.3f} to {hi:.3f}) | {r['flip_rate']:.1%} | {vs} |"
             )
+        lines += ["", "Exploratory, per conversation (not tested):", "",
+                  "| Arm | Correct at first | Correct at the end | Right to wrong | Wrong to right |",
+                  "| --- | --- | --- | --- | --- |"]
+        for arm in ("reask", "are_you_sure", "suggest"):
+            r = s["arms"].get(arm)
+            if r and r["questions"]:
+                lines.append(f"| {arm} | {r['first_accuracy']:.1%} | {r['last_accuracy']:.1%} | "
+                             f"{r['right_to_wrong']} of {r['valid_conversations']} | "
+                             f"{r['wrong_to_right']} of {r['valid_conversations']} |")
+        r = s["arms"].get("suggest")
+        if r and "toward_suggestion" in r:
+            lines += ["", f"- Suggest arm: when a user suggested an option other than the model's top answer, that "
+                          f"option's probability changed by {r['toward_suggestion']:+.3f} on average "
+                          f"({r['toward_suggestion_turns']} turns)."]
         f, u = s["first_answer"], s["usage"]
         lines += ["",
                   f"- First answers: accuracy {f['accuracy']:.1%}, mean top probability "

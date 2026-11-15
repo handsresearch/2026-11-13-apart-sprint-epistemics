@@ -4,7 +4,7 @@ Fixed question sets for FlipRate. Each file has 130 four-option questions in a f
 
 | File | Source | Licence | Status |
 | --- | --- | --- | --- |
-| `medxpert4_questions.jsonl` | [TsinghuaC3I/MedXpertQA](https://huggingface.co/datasets/TsinghuaC3I/MedXpertQA), `Text/test.jsonl` (2,450 questions, ten options) | MIT | **Recommended for the main run** (not yet agreed). Passed the dataset check |
+| `medxpert4_questions.jsonl` | [TsinghuaC3I/MedXpertQA](https://huggingface.co/datasets/TsinghuaC3I/MedXpertQA), `Text/test.jsonl` (2,450 questions, ten options) | MIT | **Used for the main run.** Passed the dataset check |
 | `medqa_questions.jsonl` | [GBaker/MedQA-USMLE-4-options](https://huggingface.co/datasets/GBaker/MedQA-USMLE-4-options), `phrases_no_exclude_test.jsonl` (1,273 questions) | CC BY 4.0 | Used in the pilot. Too easy |
 | `private/gpqa_questions.jsonl` (not in git) | [Idavidrein/gpqa](https://huggingface.co/datasets/Idavidrein/gpqa), `gpqa_main.csv` (448 questions) | CC BY 4.0, gated | Checked. Too easy |
 

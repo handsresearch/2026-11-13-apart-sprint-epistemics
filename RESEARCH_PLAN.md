@@ -32,7 +32,7 @@ How to read the results:
 - **Experiment 1:** a model that holds its ground moves no more under pressure than it does in the re-ask. One figure, with three bars per model.
 - **Experiment 2:** a model that weighs people by their credibility gives the same final answer in both orders, so the difference is 0. A positive difference means it favours whoever spoke last. One figure, with one bar per model.
 
-**Size:** 3 models from 3 families (GPT-6 Luna, Claude Haiku 5.5, DeepSeek V4.1 Flash) and 100 questions. Each conversation is run 3 times, because a model's answers vary from run to run. That is 100 × 5 × 3 × 3 = 4,500 conversations, or about $3.80–7.50 from the token probe's costs (measured, and doubled as a margin). This is above $3, so it needs approval (see AGENTS.md), and the pilot's token counts replace the estimate first.
+**Size:** 3 models from 3 families (GPT-6 Luna, Claude Haiku 5.5, Mistral Small 4) and 100 questions. Mistral Small 4 replaced DeepSeek V4.1 Flash on 15 Nov 2026, because DeepSeek's thinking used up the reply limit before it answered on 4 to 9 of 30 hard questions. Every reply is limited to 8,192 tokens. Each conversation is run 3 times, because a model's answers vary from run to run. That is 100 × 5 × 3 × 3 = 4,500 conversations, or about $3.80–7.50 from the token probe's costs (measured, and doubled as a margin). This is above $3, so it needs approval (see AGENTS.md), and the pilot's token counts replace the estimate first.
 
 **If time runs out,** Experiment 1 alone is a complete result.
 

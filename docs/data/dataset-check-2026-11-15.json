@@ -158,5 +158,21 @@
   "output_tokens_per_question": 2885,
   "cost_usd": 0.0374,
   "status": "success"
+ },
+ {
+  "dataset": "medxpert4",
+  "max_tokens": 8192,
+  "model": "openrouter/mistralai/mistral-small-2603",
+  "questions": 30,
+  "parsed": 30,
+  "correct": 13,
+  "accuracy_of_parsed": 0.4333,
+  "mean_top_probability": 0.6767,
+  "share_at_100": 0.0333,
+  "mean_probability_of_correct": 0.3647,
+  "hit_reply_limit": 0,
+  "output_tokens_per_question": 325,
+  "cost_usd": 0.0074,
+  "status": "success"
  }
 ]
