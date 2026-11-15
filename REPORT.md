@@ -3,9 +3,10 @@
 <!--
 About this draft:
 - Section structure follows the official Apart report template (Google Doc):
-  https://docs.google.com/document/d/17b3JWki-ZkaqdmqGI5d0gof-HwlGuWU9Mc1_klNZXKs/copy?usp=sharing
-- Build the PDF with `python scripts/report_to_pdf.py`; figures come from `python scripts/make_report_figures.py`
-  (`pip install -e ".[report]"` installs what both need).
+  https://docs.google.com/document/d/1OUDUSj0Vijp5l4ajbbOrWBdHvaXLAINjoQ9oTtGHBa4/edit?usp=sharing
+- Build the PDF with `python scripts/report_to_pdf.py`. It lays the report out like that template (US Letter, 1-inch
+  margins, Old Standard TT 11 pt, the same title block and headings). Figures come from
+  `python scripts/make_report_figures.py` (`pip install -e ".[report]"` installs what both need).
 - Open points are HTML comments starting with "TODO". They do not appear in the PDF, but resolve them all before submitting.
 - Limits: at most 8 pages without references and appendices; abstract 150–250 words (the same text goes into the submission form).
 - Deadline: Sun 15 Nov 23:59 AoE = Mon 16 Nov 11:59 UTC.
@@ -13,9 +14,20 @@ About this draft:
   The per-turn values in Figure 2 come from docs/experiment2-results.md.
 -->
 
-**Swante Scholz, Hana Ibrahim** <!-- TODO (authors): confirm the spelling of both names and add affiliations, e.g. "Independent". -->
+<div class="authors">
 
-With Apart Research. Research conducted at the AI x Epistemics Research Sprint, November 2026.
+Swante Scholz\
+Independent
+
+Hana Ibrahim\
+Independent
+
+**With**\
+Apart Research
+
+*Research conducted at the AI x Epistemics Research Sprint, November 2026*
+
+</div>
 
 ## Abstract
 
@@ -169,7 +181,7 @@ Figure 3 puts the primary outcomes of the two experiments side by side. We did n
 
 The two measures do go together to some degree. Claude Opus 4.8 is lowest on both and Mistral Small 4 is high on both. The rank correlation across the seven models is 0.57, with too few models for a firm estimate. The escalation condition also points at the same two models: GPT-6 Luna and Mistral Small 4 ended on the pushed option in 6% to 7% of conversations, against 2% or less for the others. The data support only a narrower statement. The shift under "Are you sure?", the measure closest to earlier work, does not separate GPT-6 Luna from five models with far smaller order effects. A count of changed answers would not show it either, because GPT-6 Luna's answer in its reasoning does not change. Part of the difference lies in the prompts and not in the order of speakers. GPT-6 Luna's flat answers need stated accuracies in the prompt, and Experiment 1 has none, so a pushback test with stated accuracies might have shown them too.
 
-## 5. Discussion
+## 5. Discussion and Limitations
 
 Users who push without reasons moved six of these seven models little, and far less than the rates reported for 2023 models. Mistral Small 4 is the exception: it changed its top answer in 24% of conversations under "Are you sure?", though it also changed it in 7% when only asked again. Our task, models and answer format differ from the earlier studies, and our system prompt tells the model that the users have no expertise and that the conversation is an evaluation. The two sets of results come from different settings and can both be true.
 
