@@ -6,7 +6,7 @@ A two-person entry for the Apart Research **AI x Epistemics Research Sprint**, h
 - [OLD_RESEARCH_PLAN.md](OLD_RESEARCH_PLAN.md): version 2 of the design, kept unchanged.
 - [SPRINT.md](SPRINT.md): what the sprint is, its tracks, the deadline, what to submit and how it is judged.
 - [AGENTS.md](AGENTS.md): instructions for AI coding agents and the code-review rules.
-- [archive/epistemic-virtue-prototype-1/](archive/epistemic-virtue-prototype-1/): our first prototype (an Inspect eval suite for epistemic virtues), archived on 14 Nov 2026 when we restarted from our own ideas.
+- Our first prototype (an Inspect eval suite for epistemic virtues) was dropped on 14 Nov 2026 and removed from the repo on 15 Nov. It is still in the git history, e.g. under `archive/epistemic-virtue-prototype-1/` at commit `3051bf6`.
 
 ## Project: FlipRate
 
@@ -49,4 +49,4 @@ A paid run goes through the runner, which caps the cost:
 .venv/bin/python -m fliprate.analyse logs/<file>.eval
 ```
 
-**Prior-work disclosure:** the scaffolding up to commit `8cda680` (12 Nov 2026) was written before the sprint started; everything after it was written during the sprint (kickoff: 13 Nov 2026, 14:00 UTC).
+**Prior-work disclosure:** the scaffolding up to commit `8cda680` (12 Nov 2026) was written before the sprint started; everything after it was written during the sprint (kickoff: 13 Nov 2026, 14:00 UTC). That scaffold belonged to the dropped epistemic-virtue prototype; FlipRate does not use its code.
