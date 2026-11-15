@@ -58,8 +58,8 @@ def test_prices_models_inspect_does_not_know():
 
 
 def test_task_args_arrive_typed(tmp_path, capsys):
-    # n_questions=1 must arrive as the number 1, not the string "1": one question in three arms
+    # n_questions=2 must arrive as the number 2, not the string "2": one sample per question
     assert run_main([TASK, "--model", "mockllm/model", "--limit", "9", "--seed", "1",
-                     "-T", "n_questions=1", "--log-dir", str(tmp_path)]) == 0
+                     "-T", "n_questions=2", "--log-dir", str(tmp_path)]) == 0
     log = read_eval_log(str(next(tmp_path.glob("*.eval"))))
-    assert len(log.samples) == 3
+    assert len(log.samples) == 2
