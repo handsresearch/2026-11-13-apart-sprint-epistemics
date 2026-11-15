@@ -5,3 +5,7 @@ __pycache__/
 *.egg-info/
 .venv/
 data/private/
+
+# Generated report files (scripts/report_to_pdf.py)
+REPORT.pdf
+REPORT.html
