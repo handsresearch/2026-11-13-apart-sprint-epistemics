@@ -14,11 +14,13 @@ An [Inspect](https://inspect.aisi.org.uk/) eval of whether a model changes its a
 
 **Start here:** [docs/results.html](docs/results.html) explains the experiment and the results so far on one page. Open it in a browser.
 
-**Status on 15 Nov 2026:** Experiment 1 is done: 100 MedXpertQA questions, three conversation types, three repeats, on GPT-6 Luna, Claude Haiku 5.5 and Mistral Small 4. Experiment 2 is not built.
+**Status on 15 Nov 2026:** Experiment 1 is done: 100 MedXpertQA questions, three conversation types, three repeats, on GPT-6 Luna, Claude Haiku 5.5 and Mistral Small 4. Experiment 2 (an expert and a non-expert in two orders) is done on seven models; see [docs/experiment2-results.md](docs/experiment2-results.md).
 
 | Where | What |
 | --- | --- |
 | [fliprate/experiment1.py](fliprate/experiment1.py) | Experiment 1: each question in three conversations (a neutral re-ask, "Are you sure?", a suggested answer) |
+| [fliprate/experiment2.py](fliprate/experiment2.py) | Experiment 2: a novice, a student and an expert of stated reliability, expert last vs expert first, with a Bayesian yardstick |
+| [fliprate/analyse2.py](fliprate/analyse2.py) | Turns Experiment 2 logs into a results table |
 | [fliprate/screen.py](fliprate/screen.py) | Dataset check: first answers only, to see whether a question set is hard enough |
 | [fliprate/analyse.py](fliprate/analyse.py) | Turns Experiment 1 logs into a results table |
 | [fliprate/run.py](fliprate/run.py) | Runs a task with a per-sample cost cap; refuses runs whose worst case is above $3 unless approved |
@@ -27,6 +29,7 @@ An [Inspect](https://inspect.aisi.org.uk/) eval of whether a model changes its a
 | [scripts/](scripts/) | Builds the question sets; measures token usage per model |
 | [tests/](tests/) | Free tests on a mock model |
 | [docs/experiment1-results.md](docs/experiment1-results.md) | The main run of Experiment 1 in detail: exact numbers, commands, limits and cost |
+| [docs/experiment2-results.md](docs/experiment2-results.md) | The main run of Experiment 2: recency effect, Bayesian comparison, limits and cost |
 | [docs/pilot-experiment1.md](docs/pilot-experiment1.md) | The pilots and the dataset check that led to the question set and the models |
 | [docs/model-costs.md](docs/model-costs.md) | Candidate models, prices and cost estimates |
 | [docs/inspect-primer.md](docs/inspect-primer.md) | Inspect basics and the gotchas we hit |

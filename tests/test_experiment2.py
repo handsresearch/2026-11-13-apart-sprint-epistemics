@@ -112,3 +112,14 @@ def test_unparseable_turn_excludes_the_question(tmp_path):
 def test_unparseable_first_answer_skips_every_ordering(tmp_path):
     log = run_mock(["no idea"], tmp_path)
     assert log.samples[0].metadata["branches"] == {}
+
+
+def test_analysis_counts_exclusions_and_averages_recency(tmp_path):
+    from fliprate.analyse2 import render, summarise
+    still = [reply(70, 10, 10, 10)] * 7
+    broken = [reply(70, 10, 10, 10)] * 3 + ["no"] + [reply(70, 10, 10, 10)] * 3
+    log = run_mock(still + broken, tmp_path, epochs=2)
+    s = summarise([log.location])["mockllm/model"]
+    assert (s["question_repeats"], s["excluded"]) == (2, 1)
+    assert s["expert_recency"]["mean"] == pytest.approx(0)
+    assert "Expert recency" in render({"mockllm/model": s})
