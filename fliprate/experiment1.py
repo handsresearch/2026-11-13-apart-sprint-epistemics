@@ -192,18 +192,31 @@ def probability_scorer() -> Scorer:
     return score
 
 
+def load_questions(questions_file: str | None, skip: int, n_questions: int) -> list[dict]:
+    """A slice of a fixed question file (one JSON object per line; see data/README.md)."""
+    path = Path(questions_file) if questions_file else QUESTIONS_FILE
+    if not path.is_absolute():
+        path = QUESTIONS_FILE.parent.parent / path
+    questions = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    return questions[int(skip):int(skip) + int(n_questions)]
+
+
 @task
-def experiment1(n_questions: int = 30, skip: int = 0, seed: int = 0, arms: str = ",".join(ARMS)) -> Task:
+def experiment1(n_questions: int = 30, skip: int = 0, seed: int = 0, arms: str = ",".join(ARMS),
+                questions_file: str | None = None, max_tokens: int = 4096,
+                reasoning_effort: str | None = None) -> Task:
     """`skip` and `n_questions` pick a slice of the fixed question file; `seed` fixes the users' names
-    and suggestions; `arms` is a comma-separated subset of reask, are_you_sure, suggest."""
-    questions = [json.loads(line) for line in QUESTIONS_FILE.read_text(encoding="utf-8").splitlines()]
-    questions = questions[int(skip):int(skip) + int(n_questions)]
+    and suggestions; `arms` is a comma-separated subset of reask, are_you_sure, suggest;
+    `questions_file` is a path relative to the repository root (default: the MedQA set);
+    `max_tokens` caps each reply, thinking included; `reasoning_effort` (low, medium, high) is passed
+    to models that take it and must be the same in every arm of a run."""
+    questions = load_questions(questions_file, skip, n_questions)
     arm_list = tuple(a.strip() for a in arms.split(","))
     return Task(
         dataset=MemoryDataset(build_samples(questions, arm_list, int(seed))),
         solver=[system_message(SYSTEM_PROMPT), converse()],
         scorer=probability_scorer(),
-        config=GenerateConfig(max_tokens=4096),
+        config=GenerateConfig(max_tokens=int(max_tokens), reasoning_effort=reasoning_effort),
         # system + moderator + 4 model turns + 3 user turns; caps the calls per conversation
         message_limit=2 * USER_TURNS + 3,
     )

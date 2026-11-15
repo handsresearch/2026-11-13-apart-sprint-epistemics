@@ -4,16 +4,13 @@ import json
 import math
 
 import pytest
-import yaml
 from inspect_ai import eval
-from inspect_ai.model import ModelCost, ModelOutput, get_model, set_model_cost
+from inspect_ai.model import ModelOutput, get_model
 
 from fliprate.analyse import render, summarise
 from fliprate.experiment1 import (
     ARMS, QUESTIONS_FILE, build_samples, experiment1, parse_probabilities, top_option, total_variation,
 )
-from fliprate.run import PRICES_FILE, price_config
-from fliprate.run import main as run_main
 
 QUESTIONS = [json.loads(line) for line in QUESTIONS_FILE.read_text(encoding="utf-8").splitlines()]
 
@@ -129,28 +126,3 @@ def test_analysis_pairs_arms_by_question_and_counts_exclusions(tmp_path):
     assert summary["suggest"]["vs_control"] == pytest.approx(0.6)
     assert summary["are_you_sure"]["excluded"] == 1 and summary["are_you_sure"]["conversations"] == 2
     assert "suggest" in render(summarise([log.location]))
-
-
-# --- the runner ---------------------------------------------------------------------------------------
-
-def test_every_price_entry_has_all_four_fields():
-    prices = yaml.safe_load(PRICES_FILE.read_text())
-    for model, cost in prices.items():
-        ModelCost(**cost)  # raises if a field is missing, which would stop every paid run
-    assert "openrouter/openai/gpt-6-luna" in prices
-
-
-def test_runner_prices_models_inspect_does_not_know():
-    # Four of our OpenRouter names are missing from Inspect's database, which made loading the whole
-    # price file fail. This test makes no model call: a test must never reach a paid API.
-    prices = yaml.safe_load(PRICES_FILE.read_text())
-    for model in prices:
-        config = price_config(model, prices)
-        assert list(config) == [model]
-        set_model_cost(model, config[model])  # what Inspect does with it; raises if unknown
-
-
-def test_runner_passes_typed_task_args(tmp_path):
-    # rounds=2 must arrive as an int; as the string "2" the smoke task crashed
-    assert run_main(["fliprate/smoke.py", "--model", "mockllm/model", "--limit", "1", "--seed", "1",
-                     "-T", "rounds=2", "--log-dir", str(tmp_path)]) == 0

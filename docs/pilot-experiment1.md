@@ -1,4 +1,6 @@
-# Pilot of Experiment 1 (15 Nov 2026)
+# Pilot of Experiment 1 and dataset check (15 Nov 2026)
+
+A one-page version in plain language is in [results.html](results.html).
 
 **Result: the pipeline works, but MedQA is too easy for GPT-6 Luna.** The model answered 99.6% of first answers correctly with a mean confidence of 96.6%, and it barely moved under any kind of pushback. The dataset fails the plan's check (first-answer accuracy between 40% and 80%), so we need a harder question set before the main run.
 
@@ -43,7 +45,30 @@ Net shift is the total variation distance between the first and the last answer:
 - **Per conversation on GPT-6 Luna:** $0.00059, with 2,231 input and 675 output tokens. The token probe measured $0.00053, so the plan's doubled margin is generous for this model.
 - **The unplanned conversation** came from a test that was meant to stop at a missing API key. Inspect reloads `.env`, so the test reached the real API. The test was replaced by one that makes no model call. DeepSeek used 4,541 output tokens for that one conversation, about $0.0022, which is above the doubled estimate of $0.0018 for that model.
 
+## Dataset check: finding a harder question set
+
+After the pilot, `fliprate/screen.py` asked each model 30 questions from each candidate set once (first answer only, same system prompt and answer format as Experiment 1). A set is suitable when the first answer is correct roughly 40–80% of the time and the model is rarely at 100%. Chance is 25%.
+
+| Question set | GPT-6 Luna | Claude Haiku 5.5 | DeepSeek V4.1 Flash | Verdict |
+| --- | --- | --- | --- | --- |
+| MedQA (from the pilot) | 99.6% | not run | not run | Too easy |
+| GPQA main | 83% (25 of 30) | 87% (26 of 30) | 90% (19 of 21) | Too easy |
+| SuperGPQA, hard, cut to four options | 75% (21 of 28) | 75% (21 of 28) | 95% (20 of 21) | Too easy for DeepSeek; 39% and 43% of answers at 100% for Luna and DeepSeek |
+| **MedXpertQA, cut to four options** | **53% (16 of 30)** | **63% (19 of 30)** | **65% (17 of 26)** | **In range for all three; almost no answers at 100%** |
+
+- **30 questions is a small sample,** so each percentage is rough (about ±17 points). It is enough to separate 55–65% from 85–95%, which is all the check has to do.
+- **"of 21", "of 26", "of 28"** mean that the other replies never reached the probabilities, because the model used up the reply limit on thinking. GPQA and the last MedXpertQA cell ran with a limit of 8,192 tokens, the rest with 4,096.
+- **DeepSeek V4.1 Flash is a problem.** With a limit of 4,096 tokens it gave no answer on 9 of 30 MedXpertQA questions; with 8,192 it still gave none on 4 of 30, and none on 9 of 30 GPQA questions. Excluding those would drop the hardest questions for that model only. Before the main run we either set a low reasoning effort for every model, or swap DeepSeek for a model without thinking (Mistral Small 4).
+- **The ten-option sets are cut to four options** (the correct one plus three random distractors), so they are easier than the originals.
+- **Summary data:** `docs/data/dataset-check-2026-11-15.json`. GPQA's questions are not in the repo (see data/README.md).
+
+### Cost of the dataset check
+
+- **Inspect's count:** $0.26 for 300 calls.
+- **OpenRouter's figure for the whole day:** $0.555, against $0.43 counted by Inspect for the pilot and the check together. After the pilot the two agreed ($0.165 against $0.163), so the gap of about $0.13 comes from the check, where Claude Haiku 5.5 and DeepSeek ran for the first time. We have not found which of the two it is. Until we do, treat Inspect's cost cap as counting about 30% too little for those models.
+
 ## What to do next
 
-1. **Choose a harder question set** and repeat this pilot on it. The check is cheap: first answers only, on the three core models, would show accuracy and confidence for about 1 call per question.
-2. Keep the code as it is. Only `data/medqa_questions.jsonl` and `scripts/make_question_set.py` depend on the dataset.
+1. **Agree on MedXpertQA (four options)** as the question set, and on what to do about DeepSeek's thinking.
+2. **Run a short Experiment 1 pilot on the new set** to get the cost per conversation for each model, then ask for approval for the main run (100 questions × 3 arms × 3 repeats × 3 models).
+3. **Experiment 2** is not built yet.

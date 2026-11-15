@@ -1,11 +1,11 @@
 """Run an Inspect task with a hard spend cap and a recorded seed.
 
 Example (free, mock model):
-    python -m fliprate.run fliprate/smoke.py --model mockllm/model --limit 3 --seed 1
+    python -m fliprate.run fliprate/experiment1.py --model mockllm/model --limit 3 --seed 1 -T n_questions=1
 
 Example (real model; costs money):
-    python -m fliprate.run fliprate/smoke.py --model anthropic/claude-haiku-5-5 \
-        --limit 3 --epochs 2 --cost-limit-per-sample 0.01 --seed 1
+    python -m fliprate.run fliprate/experiment1.py --model openrouter/openai/gpt-6-luna \
+        --limit 90 --epochs 3 --cost-limit-per-sample 0.01 --seed 1 -T n_questions=30 -T seed=1
 
 How the cap works: Inspect stops each sample once it has spent `--cost-limit-per-sample`
 dollars, so the run as a whole cannot cost much more than
@@ -43,13 +43,15 @@ def price_config(model: str, prices: dict) -> dict[str, ModelCost]:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("task", help="task file or file@task, e.g. fliprate/smoke.py")
+    p.add_argument("task", help="task file or file@task, e.g. fliprate/experiment1.py")
     p.add_argument("--model", required=True, help="e.g. anthropic/claude-haiku-5-5 or mockllm/model")
     p.add_argument("--limit", type=int, required=True, help="number of samples (questions) to run")
     p.add_argument("--epochs", type=int, default=1, help="times to repeat each sample")
     p.add_argument("--seed", type=int, required=True, help="seed recorded with the run")
     p.add_argument("--cost-limit-per-sample", type=float, help="USD cap per sample (required for paid models)")
     p.add_argument("-T", dest="task_args", action="append", default=[], help="task argument key=value")
+    p.add_argument("-M", dest="model_args", action="append", default=[],
+                   help='model argument key=value, e.g. provider=\'{"order": ["alibaba"], "allow_fallbacks": false}\'')
     p.add_argument("--log-dir", default="logs")
     p.add_argument("--approved", action="store_true", help="a human approved a worst case above $3")
     args = p.parse_args(argv)
@@ -81,19 +83,21 @@ def main(argv: list[str] | None = None) -> int:
 
     # Parse values as YAML, as `inspect eval -T` does, so rounds=2 arrives as an int and not "2".
     task_args = {k: yaml.safe_load(v) for k, v in (kv.split("=", 1) for kv in args.task_args)}
+    model_args = {k: yaml.safe_load(v) for k, v in (kv.split("=", 1) for kv in args.model_args)}
     model_cost_config = None if free else price_config(args.model, prices)
 
     logs = eval(
         args.task,
         model=args.model,
         task_args=task_args,
+        model_args=model_args,
         limit=args.limit,
         epochs=args.epochs,
         seed=args.seed,
         cost_limit=cost_limit,
         model_cost_config=model_cost_config,
         log_dir=args.log_dir,
-        metadata={"seed": args.seed, "cost_limit_per_sample": cost_limit},
+        metadata={"seed": args.seed, "cost_limit_per_sample": cost_limit, "model_args": model_args},
     )
     for log in logs:
         print(f"{log.status}: {log.location}")
