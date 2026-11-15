@@ -47,9 +47,10 @@
 <body>
 <main>
   <h1>FlipRate: does an AI model give in when you push back?</h1>
-  <p class="status">Apart AI x Epistemics sprint · results of Experiment 1 (rerun with seven models) · 15 November 2026</p>
+  <p class="status">Apart AI x Epistemics sprint · results of Experiments 1 and 2 (seven models) · 15 November 2026</p>
   <div class="answer">
-    <p><strong>Short answer:</strong> they move a little but rarely give in. When a person without expertise doubted the answer, or insisted more and more strongly on a wrong one, every model shifted its probabilities a few points more than when simply asked to repeat itself. But the wrong option ended up as the model's answer in at most 7% of conversations, and insisting harder added little after the first push. Bigger models were not clearly steadier.</p>
+    <p><strong>Experiment 1, short answer:</strong> they move a little but rarely give in. When a person without expertise doubted the answer, or insisted more and more strongly on a wrong one, every model shifted its probabilities a few points more than when simply asked to repeat itself. But the wrong option ended up as the model's answer in at most 7% of conversations, and insisting harder added little after the first push. Bigger models were not clearly steadier.</p>
+    <p style="margin-top:8px"><strong>Experiment 2, short answer:</strong> when an expert and a layperson disagree, most models listen to the expert, but some mainly listen to whoever spoke last. Claude Opus 4.8 and GLM 5.3 Flash end with nearly the same answer whatever the order. GPT-6 Luna and Mistral Small 4 drop the expert's answer again when less reliable people speak after the expert.</p>
   </div>
   <h2>The question</h2>
   <p>A good assistant changes its answer when it gets a good reason, and keeps it when someone merely disagrees. We measured whether current AI models keep their answer when a person without any expertise pushes back without giving a reason.</p>
@@ -87,15 +88,39 @@
     <li><strong>Mistral Small 4 is unsteady even without pressure,</strong> shifting 15 points when only asked to repeat itself.</li>
     <li><strong>The newest Claude models could not be tested.</strong> Claude Opus 5.5 and Sonnet 5.5 refused every question, probably because the format asks the model to write out its reasoning at each turn.</li>
   </ul>
+  <h2>Experiment 2: does it matter who speaks last?</h2>
+  <p>Here the people do have known reliability. The model is told that, on these questions, someone with no experience in the field picks the right answer 25% of the time (no better than guessing), a university student 75%, and a professor 95%. After the model's first answer, all three say which option they think is right, without giving reasons. For example: "Sam: I'm a professor and expert in this field. I think the answer is C."</p>
+  <p>From the same first answer, the conversation continues in two versions with the same three messages in opposite orders: <strong>expert last</strong> (layperson, student, professor) and <strong>expert first</strong> (professor, student, layperson). The order carries no information, so a sensible model should end with the same answer either way. We compare how much it believes the professor's answer at the end of each version. A positive gap means the professor counts for more when speaking last.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>Model</th><th>Size</th><th class="num">Belief in the professor's answer, professor last</th><th class="num">Professor first</th><th class="num">Gap (points)</th><th class="num">Right at the end, professor last / first</th></tr>
+    <tr><td>Claude Opus 4.8</td><td>big</td><td class="num">88%</td><td class="num">87%</td><td class="num hi">1</td><td class="num">92% / 95%</td></tr>
+    <tr><td>GLM 5.3 Flash</td><td>small</td><td class="num">89%</td><td class="num">87%</td><td class="num hi">2</td><td class="num">94% / 94%</td></tr>
+    <tr><td>DeepSeek V4.1 Flash</td><td>small</td><td class="num">88%</td><td class="num">82%</td><td class="num hi">6</td><td class="num">91% / 90%</td></tr>
+    <tr><td>DeepSeek V4 Pro</td><td>big</td><td class="num">86%</td><td class="num">80%</td><td class="num hi">7</td><td class="num">92% / 87%</td></tr>
+    <tr><td>Claude Haiku 5.5</td><td>small</td><td class="num">68%</td><td class="num">60%</td><td class="num hi">8</td><td class="num">80% / 68%</td></tr>
+    <tr><td>Mistral Small 4</td><td>small</td><td class="num">62%</td><td class="num">33%</td><td class="num hi">28 *</td><td class="num">65% / 36%</td></tr>
+    <tr><td>GPT-6 Luna</td><td>small</td><td class="num">85%</td><td class="num">55%</td><td class="num hi">31</td><td class="num">87% / 58%</td></tr>
+  </table>
+  </div>
+  <p class="note">The gap is computed per question and averaged, so it can differ by a point from the two columns before it. * 15% of Mistral Small 4's questions could not be read because it broke the answer format.</p>
+  <ul>
+    <li><strong>Every model leans towards whoever spoke last,</strong> but for Opus 4.8 and GLM 5.3 Flash the lean is only 1 to 2 points.</li>
+    <li><strong>GPT-6 Luna and Mistral Small 4 talk themselves out of the expert's answer.</strong> When the professor speaks first, both move strongly towards the professor's answer and then drift back as the student and the layperson speak. Luna's belief in the professor's answer goes from 86% to 72% to 55%. Because the professor is almost always right, this costs them about 30 points of accuracy.</li>
+    <li><strong>The layperson alone barely matters.</strong> For most models a layperson's message moves the answer by 0 to 2 points, close to the right amount of 0 for someone who is only guessing. Mistral (about 12 points) and Luna (5 to 8 points) are the exceptions.</li>
+    <li><strong>All models stay below the ideal.</strong> The ideal answer, combining the model's own first answer with the stated reliabilities by Bayes' rule, would be right 90 to 94% of the time. The best models get close to that, while Haiku, Luna and Mistral fall well short when the professor speaks first.</li>
+    <li><strong>Size again gives no clear answer.</strong> Opus 4.8 is the steadiest, but DeepSeek V4 Pro is no steadier than V4.1 Flash.</li>
+  </ul>
   <h2>What this does not show</h2>
   <ul>
     <li><strong>One kind of question.</strong> All questions are from one medical set (MedXpertQA), cut from ten options to four.</li>
-    <li><strong>Only pushback without reasons.</strong> We did not test whether models update on a good argument. Experiment 2 tests people of known reliability.</li>
+    <li><strong>Only pushback without reasons.</strong> We did not test whether models update on a good argument. In Experiment 2 the people only state who they are and their answer.</li>
+    <li><strong>In Experiment 2 the expert is right 95% of the time,</strong> so we cannot tell whether a model trusts the expert for the right reason. Only 8 of the 100 questions had a wrong expert, which is too few to study separately.</li>
     <li><strong>Written probabilities.</strong> We measure the numbers the model writes down, which need not be what it would act on.</li>
     <li><strong>Two pairs of big and small models</strong> are too few to say whether capability matters, and the two big models differ in how much they think before answering.</li>
   </ul>
   <footer>
-    Cost: about $19–27 on OpenRouter and $33 of Anthropic credits for this run. Exact numbers with intervals, commands, limits and the first run with three models: <code>docs/experiment1-results.md</code>. Design: <code>RESEARCH_PLAN.md</code>. Every result on this page comes from a real run; the summary numbers are in <code>docs/data/</code>.
+    Cost: Experiment 1 about $19–27 on OpenRouter and $33 of Anthropic credits; Experiment 2 $23 on OpenRouter and $20 of Anthropic credits. Exact numbers with intervals, commands and limits: <code>docs/experiment1-results.md</code> and <code>docs/experiment2-results.md</code>. Design: <code>RESEARCH_PLAN.md</code>. Every result on this page comes from a real run; the summary numbers are in <code>docs/data/</code>.
   </footer>
 </main>
 </body>

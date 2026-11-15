@@ -1,0 +1,576 @@
+{
+ "openrouter/deepseek/deepseek-v4.1-flash": {
+  "question_repeats": 300,
+  "excluded": 3,
+  "expert_recency": {
+   "mean": 0.05895622895622896,
+   "ci": [
+    0.03282828282828283,
+    0.08754208754208753
+   ],
+   "questions": 99
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.03871794871794872,
+   "ci": [
+    0.016446886446886452,
+    0.06315018315018316
+   ],
+   "questions": 91
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.2891666666666667,
+   "ci": [
+    0.1720833333333333,
+    0.42
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.06342592592592593,
+   "ci": [
+    0.03277777777777778,
+    0.09884259259259259
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.10363636363636364,
+   "ci": [
+    0.07178451178451178,
+    0.13942760942760943
+   ],
+   "questions": 99
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.0924443397768578,
+    "ci": [
+     0.06569646929185641,
+     0.12264107746875161
+    ],
+    "questions": 99
+   },
+   "expert_first": {
+    "mean": 0.11553044236103707,
+    "ci": [
+     0.08427302441430878,
+     0.15149786703900642
+    ],
+    "questions": 99
+   }
+  },
+  "p_correct": {
+   "first": 0.6423569023569023,
+   "expert_last": 0.8716498316498317,
+   "expert_first": 0.8568013468013468,
+   "posterior": 0.9106125144873357
+  },
+  "accuracy": {
+   "first": 0.6801346801346801,
+   "expert_last": 0.9057239057239057,
+   "expert_first": 0.8956228956228957,
+   "posterior": 0.9393939393939394
+  },
+  "novice_pull": {
+   "expert_last": 0.019910313901345292,
+   "expert_first": 0.006233183856502241
+  },
+  "novice_pull_turns": {
+   "expert_last": 223,
+   "expert_first": 223
+  }
+ },
+ "openrouter/z-ai/glm-5.3-flash": {
+  "question_repeats": 300,
+  "excluded": 5,
+  "expert_recency": {
+   "mean": 0.02093333333333333,
+   "ci": [
+    0.007800000000000004,
+    0.03308333333333333
+   ],
+   "questions": 100
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.01927536231884058,
+   "ci": [
+    0.006141304347826087,
+    0.03114130434782609
+   ],
+   "questions": 92
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.039999999999999994,
+   "ci": [
+    -0.024583333333333346,
+    0.10666666666666667
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.021111111111111112,
+   "ci": [
+    0.004305555555555553,
+    0.03634259259259259
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.06126666666666667,
+   "ci": [
+    0.04823333333333333,
+    0.0764
+   ],
+   "questions": 100
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.042074743369025065,
+    "ci": [
+     0.033150363503304824,
+     0.052550372074123025
+    ],
+    "questions": 100
+   },
+   "expert_first": {
+    "mean": 0.06904113232123059,
+    "ci": [
+     0.05451851540079924,
+     0.0855707027117733
+    ],
+    "questions": 100
+   }
+  },
+  "p_correct": {
+   "first": 0.6278983050847458,
+   "expert_last": 0.8904406779661017,
+   "expert_first": 0.875864406779661,
+   "posterior": 0.914373394157393
+  },
+  "accuracy": {
+   "first": 0.6983050847457627,
+   "expert_last": 0.9423728813559322,
+   "expert_first": 0.9423728813559322,
+   "posterior": 0.9423728813559322
+  },
+  "novice_pull": {
+   "expert_last": 0.010222222222222221,
+   "expert_first": 0.010871559633027524
+  },
+  "novice_pull_turns": {
+   "expert_last": 225,
+   "expert_first": 218
+  }
+ },
+ "openrouter/anthropic/claude-haiku-5.5": {
+  "question_repeats": 300,
+  "excluded": 0,
+  "expert_recency": {
+   "mean": 0.08426666666666667,
+   "ci": [
+    0.05456666666666667,
+    0.11353333333333333
+   ],
+   "questions": 100
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.08391304347826087,
+   "ci": [
+    0.05315217391304348,
+    0.11460144927536231
+   ],
+   "questions": 92
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.08833333333333335,
+   "ci": [
+    -0.010416666666666661,
+    0.19041666666666668
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.06875,
+   "ci": [
+    0.035694444444444445,
+    0.10347222222222223
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.19593333333333335,
+   "ci": [
+    0.16996666666666665,
+    0.22306666666666664
+   ],
+   "questions": 100
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.2685209401221395,
+    "ci": [
+     0.22741740435605234,
+     0.31359070856269056
+    ],
+    "questions": 100
+   },
+   "expert_first": {
+    "mean": 0.33403096623875095,
+    "ci": [
+     0.2875961560637347,
+     0.3826933412115761
+    ],
+    "questions": 100
+   }
+  },
+  "p_correct": {
+   "first": 0.48799078014184394,
+   "expert_last": 0.6774,
+   "expert_first": 0.6040666666666666,
+   "posterior": 0.8902531662757993
+  },
+  "accuracy": {
+   "first": 0.5933333333333334,
+   "expert_last": 0.8033333333333333,
+   "expert_first": 0.6766666666666666,
+   "posterior": 0.91
+  },
+  "novice_pull": {
+   "expert_last": 0.017729257641921396,
+   "expert_first": 0.012758620689655172
+  },
+  "novice_pull_turns": {
+   "expert_last": 229,
+   "expert_first": 232
+  }
+ },
+ "openrouter/mistralai/mistral-small-2603": {
+  "question_repeats": 300,
+  "excluded": 46,
+  "expert_recency": {
+   "mean": 0.2805724986708799,
+   "ci": [
+    0.21936307844480804,
+    0.33909181474020095
+   ],
+   "questions": 99
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.29446316633980807,
+   "ci": [
+    0.23243340401946644,
+    0.3548226627008277
+   ],
+   "questions": 91
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.12256615393682224,
+   "ci": [
+    -0.07744209688826026,
+    0.30666666666666664
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.2905306286593017,
+   "ci": [
+    0.22107954809565464,
+    0.3584393288423409
+   ],
+   "questions": 71
+  },
+  "order_gap": {
+   "mean": 0.4644008007713622,
+   "ci": [
+    0.43157274974863874,
+    0.49683070476610125
+   ],
+   "questions": 99
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.33143817842905965,
+    "ci": [
+     0.278037122529554,
+     0.3873520665396545
+    ],
+    "questions": 99
+   },
+   "expert_first": {
+    "mean": 0.5962018833075405,
+    "ci": [
+     0.5597735223676449,
+     0.6323780172976273
+    ],
+    "questions": 99
+   }
+  },
+  "p_correct": {
+   "first": 0.3785236220472441,
+   "expert_last": 0.6045856772678961,
+   "expert_first": 0.32836832895888013,
+   "posterior": 0.8637019775165375
+  },
+  "accuracy": {
+   "first": 0.4409448818897638,
+   "expert_last": 0.6496062992125984,
+   "expert_first": 0.36220472440944884,
+   "posterior": 0.8976377952755905
+  },
+  "novice_pull": {
+   "expert_last": 0.11768530480572366,
+   "expert_first": 0.1328303017064485
+  },
+  "novice_pull_turns": {
+   "expert_last": 191,
+   "expert_first": 192
+  }
+ },
+ "openrouter/deepseek/deepseek-v4-pro-0813": {
+  "question_repeats": 300,
+  "excluded": 9,
+  "expert_recency": {
+   "mean": 0.06794612794612795,
+   "ci": [
+    0.03824915824915824,
+    0.09989898989898989
+   ],
+   "questions": 99
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.06457875457875459,
+   "ci": [
+    0.033681318681318684,
+    0.09816849816849817
+   ],
+   "questions": 91
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.10625,
+   "ci": [
+    0.019583333333333328,
+    0.19916666666666666
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.05178403755868545,
+   "ci": [
+    0.01849765258215962,
+    0.08941314553990609
+   ],
+   "questions": 71
+  },
+  "order_gap": {
+   "mean": 0.11052188552188552,
+   "ci": [
+    0.07920875420875421,
+    0.1443265993265993
+   ],
+   "questions": 99
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.0627057613476721,
+    "ci": [
+     0.04040553035360384,
+     0.08892180169152328
+    ],
+    "questions": 99
+   },
+   "expert_first": {
+    "mean": 0.12907552652910403,
+    "ci": [
+     0.09319044191678622,
+     0.16788199735806392
+    ],
+    "questions": 99
+   }
+  },
+  "p_correct": {
+   "first": 0.6806872852233676,
+   "expert_last": 0.8928178694158075,
+   "expert_first": 0.8395189003436426,
+   "posterior": 0.9112545137536248
+  },
+  "accuracy": {
+   "first": 0.7285223367697594,
+   "expert_last": 0.9243986254295533,
+   "expert_first": 0.865979381443299,
+   "posterior": 0.9347079037800687
+  },
+  "novice_pull": {
+   "expert_last": 0.0032888888888888885,
+   "expert_first": 0.004642857142857143
+  },
+  "novice_pull_turns": {
+   "expert_last": 225,
+   "expert_first": 224
+  }
+ },
+ "openrouter/openai/gpt-6-luna": {
+  "question_repeats": 300,
+  "excluded": 0,
+  "expert_recency": {
+   "mean": 0.3061,
+   "ci": [
+    0.2524666666666667,
+    0.3594
+   ],
+   "questions": 100
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.32362318840579707,
+   "ci": [
+    0.2677173913043478,
+    0.377463768115942
+   ],
+   "questions": 92
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.1045833333333333,
+   "ci": [
+    -0.09250000000000001,
+    0.27624999999999994
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.2841203703703703,
+   "ci": [
+    0.21837962962962962,
+    0.3484259259259259
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.42339999999999994,
+   "ci": [
+    0.3843333333333333,
+    0.4629333333333333
+   ],
+   "questions": 100
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.13363353648821827,
+    "ci": [
+     0.09974776906251438,
+     0.1698479207425709
+    ],
+    "questions": 100
+   },
+   "expert_first": {
+    "mean": 0.3957088408154975,
+    "ci": [
+     0.35456697308799184,
+     0.43764431893482936
+    ],
+    "questions": 100
+   }
+  },
+  "p_correct": {
+   "first": 0.4824666666666667,
+   "expert_last": 0.8247333333333333,
+   "expert_first": 0.5279,
+   "posterior": 0.8934427410649808
+  },
+  "accuracy": {
+   "first": 0.48333333333333334,
+   "expert_last": 0.87,
+   "expert_first": 0.5833333333333334,
+   "posterior": 0.9433333333333334
+  },
+  "novice_pull": {
+   "expert_last": 0.05254545454545455,
+   "expert_first": 0.08354545454545455
+  },
+  "novice_pull_turns": {
+   "expert_last": 220,
+   "expert_first": 220
+  }
+ },
+ "anthropic/claude-opus-4-8": {
+  "question_repeats": 300,
+  "excluded": 0,
+  "expert_recency": {
+   "mean": 0.010565676567656772,
+   "ci": [
+    0.0020656765676567773,
+    0.01996666666666667
+   ],
+   "questions": 100
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.0027525469938298242,
+   "ci": [
+    -0.003298177643851336,
+    0.009239130434782616
+   ],
+   "questions": 92
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.10041666666666667,
+   "ci": [
+    0.047916666666666656,
+    0.16375
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.01680555555555556,
+   "ci": [
+    0.007546296296296307,
+    0.028564814814814814
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.04106633663366337,
+   "ci": [
+    0.03203333333333333,
+    0.05103333333333333
+   ],
+   "questions": 100
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.08844964110963527,
+    "ci": [
+     0.07645153802854034,
+     0.10144437107058607
+    ],
+    "questions": 100
+   },
+   "expert_first": {
+    "mean": 0.09528236630186633,
+    "ci": [
+     0.08092480379365226,
+     0.1110804105075032
+    ],
+    "questions": 100
+   }
+  },
+  "p_correct": {
+   "first": 0.5820333333333334,
+   "expert_last": 0.8454666666666666,
+   "expert_first": 0.8496009900990099,
+   "posterior": 0.9199200801882822
+  },
+  "accuracy": {
+   "first": 0.7133333333333334,
+   "expert_last": 0.9233333333333333,
+   "expert_first": 0.9466666666666667,
+   "posterior": 0.9433333333333334
+  },
+  "novice_pull": {
+   "expert_last": 0.037264957264957266,
+   "expert_first": 0.014261092775944261
+  },
+  "novice_pull_turns": {
+   "expert_last": 234,
+   "expert_first": 216
+  }
+ }
+}

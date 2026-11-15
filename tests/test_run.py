@@ -63,3 +63,18 @@ def test_task_args_arrive_typed(tmp_path, capsys):
                      "-T", "n_questions=2", "--log-dir", str(tmp_path)]) == 0
     log = read_eval_log(str(next(tmp_path.glob("*.eval"))))
     assert len(log.samples) == 2
+
+
+def test_retry_reads_everything_from_the_log(tmp_path):
+    """--retry needs only the log: model, task arguments and cap come from it. (On a finished log
+    Inspect has nothing left to run, so this checks the plumbing, not a real crash.)"""
+    assert run_main([TASK, "--model", "mockllm/model", "--limit", "2", "--seed", "1",
+                     "-T", "n_questions=2", "--log-dir", str(tmp_path)]) == 0
+    first = next(tmp_path.glob("*.eval"))
+    assert run_main(["--retry", str(first), "--log-dir", str(tmp_path / "retry")]) == 0
+    assert len(read_eval_log(str(next((tmp_path / "retry").glob("*.eval")))).samples) == 2
+
+
+def test_needs_task_model_limit_and_seed_without_retry():
+    with pytest.raises(SystemExit):
+        run_main(["--model", "mockllm/model"])
