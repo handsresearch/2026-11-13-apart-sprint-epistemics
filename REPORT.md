@@ -171,9 +171,7 @@ TODO:
 
 ### Code Written Before the Sprint
 
-Before the sprint started (kickoff: 13 Nov 2026, 14:00 UTC), we wrote a small exploratory scaffold for a different idea, an Inspect suite for epistemic virtues, on the evening of 12 Nov 2026 (up to commit `8cda680`). We worked on it during the first day of the sprint, then dropped it on 14 Nov and archived it in `archive/epistemic-virtue-prototype-1/`. FlipRate does not use its code, and nothing in this report depends on it. All FlipRate code (`fliprate/`, `scripts/`, `tests/`) and every experiment were written during the sprint. Some project setup files (`pyproject.toml`, `.env.example`, `.gitignore`) started from that scaffold and were rewritten for FlipRate.
-
-<!-- TODO: If the archive folder is deleted from the repo, keep this paragraph and point to the commits instead, since the code stays in the git history. The README's own disclosure also mentions the archive and needs the same update. -->
+Before the sprint started (kickoff: 13 Nov 2026, 14:00 UTC), we wrote a small exploratory scaffold for a different idea, an Inspect suite for epistemic virtues, on the evening of 12 Nov 2026 (up to commit `8cda680`). We worked on it during the first day of the sprint, then dropped it on 14 Nov and removed it from the repository on 15 Nov; it remains in the git history (commit `8cda680` for the pre-sprint scaffold, `3051bf6` for the last archived version). FlipRate does not use its code, and nothing in this report depends on it. All FlipRate code (`fliprate/`, `scripts/`, `tests/`) and every experiment were written during the sprint. Some project setup files (`pyproject.toml`, `.env.example`, `.gitignore`) started from that scaffold and were rewritten for FlipRate.
 
 ## Author Contributions
 
