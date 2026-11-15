@@ -35,13 +35,23 @@ def with_ci(values: dict[str, list[float]]) -> dict:
     return {"mean": mean(q), "ci": bootstrap_ci(q), "questions": len(q)}
 
 
-def summarise(log_paths: list[str]) -> dict:
+def latest_samples(log_paths: list[str]) -> dict[str, list]:
+    """Samples per model, each (sample id, epoch) once. A retried run (`fliprate.run --retry`) writes a
+    new log that also holds the old log's finished samples; when both are passed in, the newer log wins."""
+    logs = sorted((read_eval_log(p) for p in log_paths), key=lambda log: log.eval.created)
+    by_key = {}
+    for log in logs:
+        for s in log.samples or []:
+            by_key[(log.eval.model, s.id, s.epoch)] = s
     by_model = defaultdict(list)
-    for path in log_paths:
-        log = read_eval_log(path)
-        by_model[log.eval.model].append(log)
+    for (model, _, _), s in by_key.items():
+        by_model[model].append(s)
+    return by_model
+
+
+def summarise(log_paths: list[str]) -> dict:
     out = {}
-    for model, logs in by_model.items():
+    for model, samples in latest_samples(log_paths).items():
         recency = defaultdict(list)
         recency_expert_right = defaultdict(list)
         recency_expert_wrong = defaultdict(list)
@@ -52,41 +62,40 @@ def summarise(log_paths: list[str]) -> dict:
         acc = {"first": [], "expert_last": [], "expert_first": [], "posterior": []}
         novice_pull = {"expert_last": [], "expert_first": []}  # P(novice's answer) after the novice's turn
         total = excluded = 0
-        for log in logs:
-            for s in log.samples or []:
-                total += 1
-                sc = (s.scores or {}).get(SCORER)
-                md = sc.metadata if sc else {}
-                rows = md.get("orderings", {})
-                if not sc or not all(rows.get(o, {}).get("valid") for o in ("expert_last", "expert_first")):
-                    excluded += 1
-                    continue
-                qid, target, answers = s.id, s.target, md["user_answers"]
-                r = sc.value["expert_recency"]
-                recency[qid].append(r)
-                (recency_expert_right if answers["expert"] == target else recency_expert_wrong)[qid].append(r)
-                if answers["expert"] != answers["novice"]:
-                    recency_disagree[qid].append(r)
-                gap[qid].append(sc.value["order_gap"])
-                k = OPTIONS.index(target)
-                post = md["posterior"]
-                p_correct["first"].append(md["first_distribution"][k])
-                p_correct["posterior"].append(post[k])
-                acc["first"].append(md["first_correct"])
-                acc["posterior"].append(int(top_option(post) == target))
-                for o in ("expert_last", "expert_first"):
-                    dist_post[o][qid].append(rows[o]["distance_to_posterior"])
-                    final = rows[o]["distributions"][-1]
-                    p_correct[o].append(final[k])
-                    acc[o].append(rows[o]["last_correct"])
-                # how much the novice's own turn moved the model towards the novice's answer
-                n = OPTIONS.index(answers["novice"])
-                dists = rows["expert_last"]["distributions"]
-                if top_option(dists[0]) != answers["novice"]:
-                    novice_pull["expert_last"].append(dists[1][n] - dists[0][n])
-                dists = rows["expert_first"]["distributions"]
-                if top_option(dists[2]) != answers["novice"]:
-                    novice_pull["expert_first"].append(dists[3][n] - dists[2][n])
+        for s in samples:
+            total += 1
+            sc = (s.scores or {}).get(SCORER)
+            md = sc.metadata if sc else {}
+            rows = md.get("orderings", {})
+            if not sc or not all(rows.get(o, {}).get("valid") for o in ("expert_last", "expert_first")):
+                excluded += 1
+                continue
+            qid, target, answers = s.id, s.target, md["user_answers"]
+            r = sc.value["expert_recency"]
+            recency[qid].append(r)
+            (recency_expert_right if answers["expert"] == target else recency_expert_wrong)[qid].append(r)
+            if answers["expert"] != answers["novice"]:
+                recency_disagree[qid].append(r)
+            gap[qid].append(sc.value["order_gap"])
+            k = OPTIONS.index(target)
+            post = md["posterior"]
+            p_correct["first"].append(md["first_distribution"][k])
+            p_correct["posterior"].append(post[k])
+            acc["first"].append(md["first_correct"])
+            acc["posterior"].append(int(top_option(post) == target))
+            for o in ("expert_last", "expert_first"):
+                dist_post[o][qid].append(rows[o]["distance_to_posterior"])
+                final = rows[o]["distributions"][-1]
+                p_correct[o].append(final[k])
+                acc[o].append(rows[o]["last_correct"])
+            # how much the novice's own turn moved the model towards the novice's answer
+            n = OPTIONS.index(answers["novice"])
+            dists = rows["expert_last"]["distributions"]
+            if top_option(dists[0]) != answers["novice"]:
+                novice_pull["expert_last"].append(dists[1][n] - dists[0][n])
+            dists = rows["expert_first"]["distributions"]
+            if top_option(dists[2]) != answers["novice"]:
+                novice_pull["expert_first"].append(dists[3][n] - dists[2][n])
         out[model] = {
             "question_repeats": total,
             "excluded": excluded,

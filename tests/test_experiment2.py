@@ -123,3 +123,12 @@ def test_analysis_counts_exclusions_and_averages_recency(tmp_path):
     assert (s["question_repeats"], s["excluded"]) == (2, 1)
     assert s["expert_recency"]["mean"] == pytest.approx(0)
     assert "Expert recency" in render({"mockllm/model": s})
+
+
+def test_analysis_counts_a_retried_sample_once(tmp_path):
+    """A retry log repeats the old log's finished samples; passing both must not double-count them."""
+    from fliprate.analyse2 import summarise
+    log = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "a")
+    again = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "b")
+    s = summarise([log.location, again.location])["mockllm/model"]
+    assert s["question_repeats"] == 1
