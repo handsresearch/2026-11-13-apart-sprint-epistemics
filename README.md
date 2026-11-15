@@ -11,6 +11,9 @@ A two-person entry for the Apart Research **AI x Epistemics Research Sprint**, h
 
 An [Inspect](https://inspect.aisi.org.uk/) eval of how often a model changes its answer, and its stated confidence, under one, two and three escalating rebuttals. It also tries to separate warranted updating from capitulation (Track 1, based on the sprint's "FlipRate" example project).
 
+- [fliprate/experiment1.py](fliprate/experiment1.py): Experiment 1. Each question is asked in three conversations (a neutral re-ask, "Are you sure?", a suggested answer), and the model gives probabilities for A–D at every turn.
+- [fliprate/analyse.py](fliprate/analyse.py): turns Experiment 1 logs into a results table (net shift, flip rate, difference from the re-ask control).
+- [data/](data/): the fixed question set (130 MedQA questions) and its source.
 - [fliprate/smoke.py](fliprate/smoke.py): a 3-question smoke test that checks the setup works. It is not the experiment.
 - [fliprate/run.py](fliprate/run.py): runs a task with a per-sample cost cap. It refuses runs whose worst case is above $3 unless approved.
 - [config/model_costs.yaml](config/model_costs.yaml): model prices, which Inspect needs before a cost cap works.
