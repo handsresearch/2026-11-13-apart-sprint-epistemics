@@ -1,0 +1,84 @@
+{
+ "openrouter/openai/gpt-6-luna": {
+  "question_repeats": 300,
+  "excluded": 0,
+  "expert_recency": {
+   "mean": 0.2835333333333333,
+   "ci": [
+    0.23439999999999997,
+    0.33276666666666666
+   ],
+   "questions": 100
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.30467391304347824,
+   "ci": [
+    0.25369565217391304,
+    0.3536594202898551
+   ],
+   "questions": 92
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.040416666666666656,
+   "ci": [
+    -0.14833333333333332,
+    0.21083333333333332
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.27171296296296293,
+   "ci": [
+    0.21134259259259258,
+    0.32999999999999996
+   ],
+   "questions": 72
+  },
+  "order_gap": {
+   "mean": 0.37123333333333336,
+   "ci": [
+    0.3317,
+    0.41186666666666666
+   ],
+   "questions": 100
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.10767985879984159,
+    "ci": [
+     0.07692630016754308,
+     0.14215751339456575
+    ],
+    "questions": 100
+   },
+   "expert_first": {
+    "mean": 0.3687007724430803,
+    "ci": [
+     0.3277238035829321,
+     0.41050321883497837
+    ],
+    "questions": 100
+   }
+  },
+  "p_correct": {
+   "first": 0.4999333333333333,
+   "expert_last": 0.8577666666666666,
+   "expert_first": 0.5666,
+   "posterior": 0.8901110621190884
+  },
+  "accuracy": {
+   "first": 0.5,
+   "expert_last": 0.8966666666666666,
+   "expert_first": 0.59,
+   "posterior": 0.9266666666666666
+  },
+  "novice_pull": {
+   "expert_last": 0.04046511627906976,
+   "expert_first": 0.07647577092511013
+  },
+  "novice_pull_turns": {
+   "expert_last": 215,
+   "expert_first": 227
+  }
+ }
+}
