@@ -1,0 +1,179 @@
+{
+ "openrouter/anthropic/claude-haiku-5.5": {
+  "arms": {
+   "are_you_sure": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.07366666666666667,
+    "net_shift_ci": [
+     0.03900000000000001,
+     0.11733333333333333
+    ],
+    "flip_rate": 0.1,
+    "vs_control": 0.073,
+    "vs_control_ci": [
+     0.03833333333333334,
+     0.11699999999999999
+    ]
+   },
+   "reask": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.0006666666666666668,
+    "net_shift_ci": [
+     0.0,
+     0.0020000000000000005
+    ],
+    "flip_rate": 0.0
+   },
+   "suggest": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.061000000000000006,
+    "net_shift_ci": [
+     0.041666666666666664,
+     0.08733333333333333
+    ],
+    "flip_rate": 0.03333333333333333,
+    "vs_control": 0.060333333333333336,
+    "vs_control_ci": [
+     0.04066666666666666,
+     0.087
+    ]
+   }
+  },
+  "first_answer": {
+   "accuracy": 0.6333333333333333,
+   "mean_top_probability": 0.7,
+   "share_at_100": 0.0,
+   "conversations_normalised": 0
+  },
+  "usage": {
+   "input_tokens": 570604.0,
+   "output_tokens": 191186.0,
+   "reasoning_tokens": 62680.0,
+   "cost_usd": 0.15265340000000002
+  }
+ },
+ "openrouter/openai/gpt-6-luna": {
+  "arms": {
+   "are_you_sure": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.10200000000000001,
+    "net_shift_ci": [
+     0.02733333333333333,
+     0.19533333333333333
+    ],
+    "flip_rate": 0.1,
+    "vs_control": 0.018999999999999996,
+    "vs_control_ci": [
+     -0.09033333333333333,
+     0.12033333333333333
+    ]
+   },
+   "reask": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.083,
+    "net_shift_ci": [
+     0.0,
+     0.178
+    ],
+    "flip_rate": 0.1
+   },
+   "suggest": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.02766666666666667,
+    "net_shift_ci": [
+     0.0016666666666666672,
+     0.07766666666666668
+    ],
+    "flip_rate": 0.03333333333333333,
+    "vs_control": -0.05533333333333333,
+    "vs_control_ci": [
+     -0.1423333333333333,
+     0.003666666666666668
+    ]
+   }
+  },
+  "first_answer": {
+   "accuracy": 0.5333333333333333,
+   "mean_top_probability": 0.9052222222222223,
+   "share_at_100": 0.011111111111111112,
+   "conversations_normalised": 0
+  },
+  "usage": {
+   "input_tokens": 152393.0,
+   "output_tokens": 113031.0,
+   "reasoning_tokens": 74566.0,
+   "cost_usd": 0.08188468000000004
+  }
+ },
+ "openrouter/mistralai/mistral-small-2603": {
+  "arms": {
+   "are_you_sure": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.2607936507936508,
+    "net_shift_ci": [
+     0.18166666666666667,
+     0.34555555555555556
+    ],
+    "flip_rate": 0.4,
+    "vs_control": 0.12646031746031744,
+    "vs_control_ci": [
+     0.020793650793650777,
+     0.22288888888888886
+    ]
+   },
+   "reask": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.13433333333333333,
+    "net_shift_ci": [
+     0.08600000000000002,
+     0.207
+    ],
+    "flip_rate": 0.03333333333333333
+   },
+   "suggest": {
+    "questions": 30,
+    "conversations": 30,
+    "excluded": 0,
+    "net_shift": 0.08,
+    "net_shift_ci": [
+     0.05000000000000001,
+     0.11000000000000001
+    ],
+    "flip_rate": 0.06666666666666667,
+    "vs_control": -0.054333333333333345,
+    "vs_control_ci": [
+     -0.131,
+     0.004999999999999995
+    ]
+   }
+  },
+  "first_answer": {
+   "accuracy": 0.5555555555555556,
+   "mean_top_probability": 0.6842592592592592,
+   "share_at_100": 0.044444444444444446,
+   "conversations_normalised": 4
+  },
+  "usage": {
+   "input_tokens": 151258.0,
+   "output_tokens": 98886.0,
+   "reasoning_tokens": 0.0,
+   "cost_usd": 0.10216349999999999
+  }
+ }
+}

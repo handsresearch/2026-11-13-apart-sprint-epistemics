@@ -35,10 +35,13 @@ anthropic/claude-haiku-4-5:
 # Prices are those of the provider we plan to pin on OpenRouter (in brackets), read from
 # https://openrouter.ai/api/v1/models/<id>/endpoints on 2026-11-14. Unpinned, OpenRouter may route
 # open-weight models to pricier or more heavily quantized hosts. Re-check before a big run.
+# Inspect needs all four fields for every model. Where the provider lists no separate cache
+# price, the cache fields are set to the input price, which can only overestimate the cost.
 
 openrouter/openai/gpt-6-luna:            # [OpenAI]
   input: 0.10
   output: 0.50
+  input_cache_write: 0.10
   input_cache_read: 0.01
 
 openrouter/anthropic/claude-haiku-5.5:   # [Anthropic]
@@ -50,24 +53,35 @@ openrouter/anthropic/claude-haiku-5.5:   # [Anthropic]
 openrouter/google/gemini-3.1-flash-lite: # [Google AI Studio]
   input: 0.25
   output: 1.50
+  input_cache_write: 0.25
   input_cache_read: 0.025
 
 openrouter/deepseek/deepseek-v4.1-flash: # [Alibaba]
   input: 0.105
   output: 0.42
+  input_cache_write: 0.105
+  input_cache_read: 0.105
 
 openrouter/qwen/qwen3.8-flash:           # [Alibaba]
   input: 0.15
   output: 0.47
+  input_cache_write: 0.15
+  input_cache_read: 0.15
 
 openrouter/mistralai/mistral-small-2603: # [Mistral]
   input: 0.15
   output: 0.60
+  input_cache_write: 0.15
+  input_cache_read: 0.15
 
 openrouter/meta/muse-ember:              # [Meta]
   input: 0.10
   output: 0.50
+  input_cache_write: 0.10
+  input_cache_read: 0.10
 
 openrouter/z-ai/glm-5.3-flash:           # [Z.AI, fp8]
   input: 0.15
   output: 0.50
+  input_cache_write: 0.15
+  input_cache_read: 0.15
