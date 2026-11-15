@@ -185,3 +185,14 @@ def test_analysis_pairs_arms_by_question_and_counts_exclusions(tmp_path):
     assert summary["are_you_sure"]["excluded"] == 1 and summary["are_you_sure"]["conversations"] == 2
     assert "capitulation_rate" in summary["escalate"]
     assert "escalate" in render(summarise([log.location]))
+
+
+def test_first_answer_counted_once_per_sample(tmp_path):
+    # a broken branch must not change the first-answer statistics
+    first = [reply(70, 10, 10, 10)]
+    still = [reply(70, 10, 10, 10)] * 3
+    broken = ["no"] + [reply(70, 10, 10, 10)] * 2
+    log = run_mock(first + still + broken, tmp_path, arms="reask,are_you_sure")
+    f = summarise([log.location])["mockllm/model"]["first_answer"]
+    assert f["mean_top_probability"] == pytest.approx(0.7)
+    assert f["accuracy"] == int(log.samples[0].target == "A")

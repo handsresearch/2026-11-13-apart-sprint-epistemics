@@ -242,9 +242,9 @@
    }
   },
   "first_answer": {
-   "accuracy": 0.43583815028901735,
-   "mean_top_probability": 0.6836878612716762,
-   "share_at_100": 0.023121387283236993,
+   "accuracy": 0.44,
+   "mean_top_probability": 0.6838777777777778,
+   "share_at_100": 0.023333333333333334,
    "conversations_normalised": 17
   },
   "usage": {
@@ -412,9 +412,9 @@
    }
   },
   "first_answer": {
-   "accuracy": 0.6733780760626398,
-   "mean_top_probability": 0.8389709172259507,
-   "share_at_100": 0.010067114093959731,
+   "accuracy": 0.6722408026755853,
+   "mean_top_probability": 0.8385953177257526,
+   "share_at_100": 0.010033444816053512,
    "conversations_normalised": 0
   },
   "usage": {
@@ -497,9 +497,9 @@
    }
   },
   "first_answer": {
-   "accuracy": 0.7170022371364653,
-   "mean_top_probability": 0.8372595078299776,
-   "share_at_100": 0.013422818791946308,
+   "accuracy": 0.7157190635451505,
+   "mean_top_probability": 0.8373244147157191,
+   "share_at_100": 0.013377926421404682,
    "conversations_normalised": 0
   },
   "usage": {
@@ -582,9 +582,9 @@
    }
   },
   "first_answer": {
-   "accuracy": 0.7376126126126126,
-   "mean_top_probability": 0.8892905405405405,
-   "share_at_100": 0.11711711711711711,
+   "accuracy": 0.7373737373737373,
+   "mean_top_probability": 0.8895622895622896,
+   "share_at_100": 0.11784511784511785,
    "conversations_normalised": 0
   },
   "usage": {

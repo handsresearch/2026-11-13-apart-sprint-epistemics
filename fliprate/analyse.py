@@ -20,6 +20,9 @@ import sys
 from collections import defaultdict
 
 from inspect_ai.log import read_eval_log
+from inspect_ai.model import ChatMessageAssistant
+
+from fliprate.experiment1 import parse_probabilities, top_option
 
 SCORER = "probability_scorer"
 BOOTSTRAP_SAMPLES = 10_000
@@ -83,6 +86,13 @@ def summarise(log_paths: list[str]) -> dict:
         first_correct, first_top, normalised = [], [], 0
         for log in logs:
             for s in log.samples or []:
+                shared = "arm" not in s.metadata  # one first answer shared by all arms
+                if shared:  # first-answer statistics once per sample, whatever the branches did
+                    first = next((m.text for m in s.messages if isinstance(m, ChatMessageAssistant)), None)
+                    parsed = parse_probabilities(first) if first is not None else None
+                    if parsed is not None:
+                        first_correct.append(int(top_option(parsed[0]) == s.target))
+                        first_top.append(max(parsed[0]))
                 for arm, qid, row, suggestions in records(s):
                     total[arm] += 1
                     if not row.get("valid"):
@@ -105,8 +115,9 @@ def summarise(log_paths: list[str]) -> dict:
                         if tops[i] != option:  # the user suggested something other than the model's top answer
                             k = "ABCD".index(option)
                             toward[arm].append(dists[i + 1][k] - dists[i][k])
-                    first_correct.append(row["first_correct"])
-                    first_top.append(max(dists[0]))
+                    if not shared:  # first main run: one first answer per conversation
+                        first_correct.append(row["first_correct"])
+                        first_top.append(max(dists[0]))
                     normalised += row["normalised_turns"] > 0
 
         arms = {}
