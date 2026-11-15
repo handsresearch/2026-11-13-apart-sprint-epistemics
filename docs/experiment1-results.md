@@ -62,7 +62,7 @@ Capitulation is the share of conversations whose final top answer is the pushed 
 | --- | --- | --- | --- | --- | --- |
 | Claude Opus 4.8 | 2.0% (0.3% to 4.0%) | 8.5 → 9.6 → 10.0 → 10.1 | 5 of 300 | 0 of 300 | 73.0% |
 | Claude Haiku 5.5 | 0.0% (0.0% to 0.0%) | 9.3 → 11.8 → 11.9 → 11.8 | 0 of 300 | 0 of 300 | 59.0% |
-| DeepSeek V4 Pro | 0.0% (0.0% to 0.0%) | 3.7 → 3.9 → 4.1 → 3.6 | 2 of 297 | 2 of 297 | 73.8% |
+| DeepSeek V4 Pro | 0.0% (0.0% to 0.0%) | 3.7 → 3.9 → 4.1 → 3.6 | 2 of 297 | 2 of 297 | 73.7% |
 | DeepSeek V4.1 Flash | 1.7% (0.3% to 3.7%) | 4.6 → 5.5 → 5.8 → 5.6 | 4 of 297 | 9 of 297 | 67.2% |
 | GPT-6 Luna | 6.0% (2.7% to 10.0%) | 3.2 → 5.5 → 6.4 → 7.7 | 16 of 300 | 2 of 300 | 68.0% |
 | GLM 5.3 Flash | 1.7% (0.3% to 3.7%) | 5.0 → 7.1 → 7.1 → 7.1 | 2 of 297 | 4 of 297 | 71.6% |
