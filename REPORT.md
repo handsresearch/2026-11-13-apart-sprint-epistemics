@@ -123,7 +123,11 @@ TODO: What the results mean for AI safety and epistemics.
 - Trends across model size or family once the rerun is in.
 -->
 
-### Limitations
+### Limitations, Dual-Use and Ethical Considerations
+
+<!-- The sprint requires a "Limitations and Dual-Use / Ethical Considerations" section. We keep it here in the Discussion rather than in an appendix (agreed 15 Nov). -->
+
+#### Limitations
 
 <!--
 TODO: Expand each into a sentence or two, and say how the interpretation would change if the assumption did not hold.
@@ -139,11 +143,10 @@ TODO: Expand each into a sentence or two, and say how the interpretation would c
 - Experiment 2: stated user accuracies and the independence assumption behind the Bayesian reference. (confirm once built)
 -->
 
-### Dual-Use and Ethical Considerations
+#### Dual-Use and Ethical Considerations
 
 <!--
-TODO: SPRINT.md lists a required appendix "Limitations and Dual-Use / Ethical Considerations", which the template does not have as a heading. Decide whether to keep this subsection here or move both into an appendix.
-Points: the eval could be used to tune models to resist pushback, including warranted correction; findings on which pressure works could help manipulate models; medical questions, but no advice is given to real patients.
+TODO: Expand into a short paragraph. Points: the eval could be used to tune models to resist pushback, including warranted correction; findings on which pressure works could help manipulate models; medical questions, but no advice is given to real patients.
 -->
 
 ### Future Work
@@ -166,7 +169,11 @@ TODO:
 - Data: MedXpertQA, cut to four options (`data/medxpert4_questions.jsonl`); summary data in `docs/data/`. <!-- TODO: cite MedXpertQA and check its licence -->
 - Other artifacts: <!-- TODO: optional video (3–5 min) or slides -->
 
-<!-- TODO: Prior-work disclosure. The sprint rules require any code written before the sprint to be marked as preexisting in the README and the report. Check whether anything in the repo predates 13 Nov and say so here. -->
+### Code Written Before the Sprint
+
+Before the sprint started (kickoff: 13 Nov 2026, 14:00 UTC), we wrote a small exploratory scaffold for a different idea, an Inspect suite for epistemic virtues, on the evening of 12 Nov 2026 (up to commit `8cda680`). We worked on it during the first day of the sprint, then dropped it on 14 Nov and archived it in `archive/epistemic-virtue-prototype-1/`. FlipRate does not use its code, and nothing in this report depends on it. All FlipRate code (`fliprate/`, `scripts/`, `tests/`) and every experiment were written during the sprint. Some project setup files (`pyproject.toml`, `.env.example`, `.gitignore`) started from that scaffold and were rewritten for FlipRate.
+
+<!-- TODO: If the archive folder is deleted from the repo, keep this paragraph and point to the commits instead, since the code stays in the git history. The README's own disclosure also mentions the archive and needs the same update. -->
 
 ## Author Contributions
 
