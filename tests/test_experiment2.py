@@ -125,10 +125,14 @@ def test_analysis_counts_exclusions_and_averages_recency(tmp_path):
     assert "Expert recency" in render({"mockllm/model": s})
 
 
-def test_analysis_counts_a_retried_sample_once(tmp_path):
-    """A retry log repeats the old log's finished samples; passing both must not double-count them."""
+def test_analysis_counts_a_retried_sample_once_but_keeps_separate_runs(tmp_path):
+    """A retry log repeats the old log's finished samples (same task id): count them once. Separate runs,
+    e.g. one per model seed, have their own task ids and are all kept."""
     from fliprate.analyse2 import summarise
+    from fliprate.run import main as run_main
     log = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "a")
-    again = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "b")
-    s = summarise([log.location, again.location])["mockllm/model"]
-    assert s["question_repeats"] == 1
+    other = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "b")
+    assert summarise([log.location, other.location])["mockllm/model"]["question_repeats"] == 2
+    assert run_main(["--retry", log.location, "--log-dir", str(tmp_path / "retry")]) == 0
+    retried = str(next((tmp_path / "retry").glob("*.eval")))
+    assert summarise([log.location, retried])["mockllm/model"]["question_repeats"] == 1

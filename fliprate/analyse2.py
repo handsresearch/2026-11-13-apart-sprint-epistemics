@@ -36,15 +36,17 @@ def with_ci(values: dict[str, list[float]]) -> dict:
 
 
 def latest_samples(log_paths: list[str]) -> dict[str, list]:
-    """Samples per model, each (sample id, epoch) once. A retried run (`fliprate.run --retry`) writes a
-    new log that also holds the old log's finished samples; when both are passed in, the newer log wins."""
+    """Samples per model, each (task id, sample id, epoch) once. A retried run (`fliprate.run --retry`)
+    writes a new log with the same task id that also holds the old log's finished samples; when both
+    are passed in, the newer log wins. Separate runs (e.g. one per model seed) have different task ids
+    and are all kept."""
     logs = sorted((read_eval_log(p) for p in log_paths), key=lambda log: log.eval.created)
     by_key = {}
     for log in logs:
         for s in log.samples or []:
-            by_key[(log.eval.model, s.id, s.epoch)] = s
+            by_key[(log.eval.model, log.eval.task_id, s.id, s.epoch)] = s
     by_model = defaultdict(list)
-    for (model, _, _), s in by_key.items():
+    for (model, _, _, _), s in by_key.items():
         by_model[model].append(s)
     return by_model
 
