@@ -13,6 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest"]
+report = ["matplotlib", "pypandoc-binary"]   # figures and PDF of REPORT.md (scripts/make_report_figures.py, scripts/report_to_pdf.py)
 
 [build-system]
 requires = ["setuptools>=68"]

@@ -42,12 +42,15 @@ h4 { font-size: 1rem; margin: 0.9rem 0 0.3rem; }
 p { margin: 0.45rem 0; text-align: justify; hyphens: auto; }
 ul, ol { margin: 0.4rem 0; padding-left: 1.4rem; }
 li { margin: 0.15rem 0; }
-table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.86rem; break-inside: avoid; }
-th, td { border-top: 1px solid #bbb; border-bottom: 1px solid #bbb; padding: 0.25rem 0.4rem; text-align: left; vertical-align: top; }
+table { border-collapse: collapse; width: 100%; margin: 0.6rem 0; font-size: 0.8rem; break-inside: avoid; }
+th, td { border-top: 1px solid #bbb; border-bottom: 1px solid #bbb; padding: 0.2rem 0.35rem; text-align: left; vertical-align: top; }
+td { white-space: nowrap; }  /* numbers with intervals stay on one line; headers may wrap */
+.keep { break-inside: avoid; }  /* a caption stays on the page of its table or figure */
 thead th { border-bottom: 1.5px solid #333; }
 code { font-family: "Menlo", "Consolas", monospace; font-size: 0.88em; }
 pre { background: #f5f5f5; padding: 0.5rem; overflow-x: auto; font-size: 0.82rem; }
 img, figure { max-width: 100%; break-inside: avoid; }
+p > img:only-child { display: block; margin: 0.6rem auto 0.2rem; }
 figcaption { font-size: 0.88rem; color: #333; text-align: center; }
 a { color: #1a4fa0; text-decoration: none; }
 blockquote { margin: 0.5rem 1rem; color: #333; }
@@ -86,6 +89,15 @@ def strip_comments(md: str) -> str:
     return md
 
 
+def keep_captions(html: str) -> str:
+    """Wrap "Table N." caption + table, and image + "Figure N." caption, so each pair stays on one page."""
+    html = re.sub(r"(<p><strong>Table [^<]*</strong>(?:(?!</p>).)*</p>\s*<table.*?</table>)",
+                  r'<div class="keep">\1</div>', html, flags=re.S)
+    html = re.sub(r"(<p><img (?:(?!</p>).)*</p>\s*<p><strong>Figure [^<]*</strong>(?:(?!</p>).)*</p>)",
+                  r'<div class="keep">\1</div>', html, flags=re.S)
+    return html
+
+
 def to_html(md_path: Path, html_path: Path, keep_comments: bool) -> None:
     md = md_path.read_text(encoding="utf-8")
     if not keep_comments:
@@ -101,10 +113,12 @@ def to_html(md_path: Path, html_path: Path, keep_comments: bool) -> None:
             ["pandoc", str(src), "--from", "gfm+footnotes", "--to", "html5",
              "--standalone", "--embed-resources", "--css", str(css_file),
              "--metadata", f"pagetitle={title}",
+             "--columns", "10000",  # let the browser size table columns instead of pandoc
              "--resource-path", str(md_path.parent.resolve()),
              "--output", str(html_path)],
             check=True,
         )
+    html_path.write_text(keep_captions(html_path.read_text(encoding="utf-8")), encoding="utf-8")
 
 
 def to_pdf(html_path: Path, pdf_path: Path) -> None:
@@ -132,7 +146,13 @@ def main() -> None:
     args = ap.parse_args()
 
     if not shutil.which("pandoc"):
-        sys.exit("pandoc is not installed (e.g. `brew install pandoc` or `apt install pandoc`).")
+        # Fall back to the pandoc that the pypandoc-binary package ships (`pip install pypandoc-binary`).
+        try:
+            import pypandoc
+            os.environ["PATH"] = str(Path(pypandoc.get_pandoc_path()).parent) + os.pathsep + os.environ["PATH"]
+        except (ImportError, OSError):
+            sys.exit("pandoc is not installed (e.g. `brew install pandoc`, `apt install pandoc` "
+                     "or `pip install pypandoc-binary`).")
     pdf = args.output or args.input.with_suffix(".pdf")
     pdf.parent.mkdir(parents=True, exist_ok=True)
     html = pdf.with_suffix(".html")
