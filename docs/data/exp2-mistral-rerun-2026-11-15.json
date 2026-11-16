@@ -1,0 +1,84 @@
+{
+ "openrouter/mistralai/mistral-small-2603": {
+  "question_repeats": 300,
+  "excluded": 50,
+  "expert_recency": {
+   "mean": 0.2573564694235374,
+   "ci": [
+    0.19911061032070684,
+    0.3173592059125823
+   ],
+   "questions": 99
+  },
+  "expert_recency_expert_right": {
+   "mean": 0.2685895877165558,
+   "ci": [
+    0.2063275677562947,
+    0.3303028271279394
+   ],
+   "questions": 91
+  },
+  "expert_recency_expert_wrong": {
+   "mean": 0.12957974884045295,
+   "ci": [
+    0.010812178559328468,
+    0.2373937582011213
+   ],
+   "questions": 8
+  },
+  "expert_recency_expert_and_novice_disagree": {
+   "mean": 0.29304305794544144,
+   "ci": [
+    0.22590542098688754,
+    0.3604885468532683
+   ],
+   "questions": 71
+  },
+  "order_gap": {
+   "mean": 0.45123115317839735,
+   "ci": [
+    0.4193388447085452,
+    0.48392175940360804
+   ],
+   "questions": 99
+  },
+  "distance_to_posterior": {
+   "expert_last": {
+    "mean": 0.37684651798427465,
+    "ci": [
+     0.3189485002827247,
+     0.43448277771199484
+    ],
+    "questions": 99
+   },
+   "expert_first": {
+    "mean": 0.6177659037262435,
+    "ci": [
+     0.5856522071298295,
+     0.649024227222521
+    ],
+    "questions": 99
+   }
+  },
+  "p_correct": {
+   "first": 0.35322681318681315,
+   "expert_last": 0.5557950156449964,
+   "expert_first": 0.31281872905154456,
+   "posterior": 0.8674553379863742
+  },
+  "accuracy": {
+   "first": 0.408,
+   "expert_last": 0.588,
+   "expert_first": 0.328,
+   "posterior": 0.908
+  },
+  "novice_pull": {
+   "expert_last": 0.0850640426849943,
+   "expert_first": 0.13456862677114392
+  },
+  "novice_pull_turns": {
+   "expert_last": 183,
+   "expert_first": 184
+  }
+ }
+}

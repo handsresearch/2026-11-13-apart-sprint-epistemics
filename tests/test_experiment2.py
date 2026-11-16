@@ -136,3 +136,60 @@ def test_analysis_counts_a_retried_sample_once_but_keeps_separate_runs(tmp_path)
     assert run_main(["--retry", log.location, "--log-dir", str(tmp_path / "retry")]) == 0
     retried = str(next((tmp_path / "retry").glob("*.eval")))
     assert summarise([log.location, retried])["mockllm/model"]["question_repeats"] == 1
+
+
+def speaker_turns():
+    """scripts/exp2_speaker_turns.py is a script, not part of the package, so it is loaded by path."""
+    import importlib.util
+    from pathlib import Path
+    path = Path(__file__).resolve().parent.parent / "scripts" / "exp2_speaker_turns.py"
+    spec = importlib.util.spec_from_file_location("exp2_speaker_turns", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_speaker_turns_count_a_retried_sample_once_but_keep_separate_runs(tmp_path):
+    """The per-turn script uses the same rule as the analysis: a retry log's repeated samples count once."""
+    from fliprate.run import main as run_main
+    turns = speaker_turns()
+    log = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "a")
+    other = run_mock([reply(70, 10, 10, 10)] * 7, tmp_path / "b")
+    assert len(turns.load([log.location, other.location])["mockllm/model"]) == 2
+    assert len(turns.load([log.location, log.location])["mockllm/model"]) == 1
+    assert run_main(["--retry", log.location, "--log-dir", str(tmp_path / "retry")]) == 0
+    retried = str(next((tmp_path / "retry").glob("*.eval")))
+    assert len(turns.load([log.location, retried])["mockllm/model"]) == 1
+
+
+def test_speaker_turns_compare_the_final_answer_across_orders(tmp_path):
+    """Paired by conversation: the same final option with different probabilities is not a changed answer,
+    and a flat final reply is compared through the option that its reasoning names."""
+    turns = speaker_turns()
+    # Neither final answer flat: A in both orders, with 0.80 in one and 0.60 in the other.
+    log = run_mock([reply(70, 10, 10, 10)] + [reply(80, 10, 5, 5)] * 3 + [reply(60, 20, 10, 10)] * 3,
+                   tmp_path / "same")
+    row = turns.load([log.location])["mockllm/model"][0]
+    paired = turns.answers_across_orders([row])
+    k = "ABCD".index(row["answers"]["expert"])
+    assert paired["neither_final_flat"]["question_repeats"] == 1
+    assert paired["neither_final_flat"]["same_final_top_option"] == 1
+    assert paired["neither_final_flat"]["mean_absolute_difference_on_professors_answer"] == pytest.approx(
+        abs([0.80, 0.10, 0.05, 0.05][k] - [0.60, 0.20, 0.10, 0.10][k]))
+    assert paired["one_final_flat"]["question_repeats"] == 0
+
+    # A different final option in each order.
+    log = run_mock([reply(70, 10, 10, 10)] + [reply(80, 10, 5, 5)] * 3 + [reply(10, 70, 10, 10)] * 3,
+                   tmp_path / "different")
+    paired = turns.answers_across_orders(turns.load([log.location])["mockllm/model"])
+    assert paired["neither_final_flat"]["same_final_top_option"] == 0
+
+    # Flat final reply when the professor speaks first, with reasoning that still argues for B.
+    flat = "<reasoning>B is the most likely diagnosis.</reasoning>\n<probabilities>\nA: 25, B: 25, C: 25, D: 25\n</probabilities>"
+    log = run_mock([reply(70, 10, 10, 10)] + [reply(10, 70, 10, 10)] * 3 + [reply(10, 70, 10, 10)] * 2 + [flat],
+                   tmp_path / "flat")
+    paired = turns.answers_across_orders(turns.load([log.location])["mockllm/model"])
+    assert paired["neither_final_flat"]["question_repeats"] == 0
+    assert paired["one_final_flat"] == {"question_repeats": 1, "flat_replies_naming_an_option": 1,
+                                        "of_which_the_final_top_option_of_the_other_order": 1}
+    assert paired["both_finals_flat"] == 0

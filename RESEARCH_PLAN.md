@@ -1,8 +1,8 @@
 # FlipRate research plan
 
-**Status:** experiment design, version 3, agreed with adjustments. Version 1 was Swante's tentative design. Version 2 added Hana's review points from PR #8, which both authors agreed to on 14 Nov 2026. Version 3 is Hana's proposal of 15 Nov 2026. Swante agreed to it on 15 Nov 2026 with the adjustments listed below; Hana has not yet confirmed the adjustments. Version 2 is kept unchanged in [OLD_RESEARCH_PLAN.md](OLD_RESEARCH_PLAN.md).
+**Status:** experiment design, version 3, agreed with adjustments. Version 1 was Swante's tentative design. Version 2 added Hana's review points from PR #8, which both authors agreed to on 14 Nov 2026. Version 3 is Hana's proposal of 15 Nov 2026. Swante agreed to it on 15 Nov 2026 with the adjustments listed below, and Hana agreed to the adjustments on 15 Nov 2026. Version 2 is kept unchanged in [OLD_RESEARCH_PLAN.md](OLD_RESEARCH_PLAN.md).
 
-**Adjustments of 15 Nov 2026 (proposed by Swante; not yet agreed by Hana):**
+**Adjustments of 15 Nov 2026 (proposed by Swante; agreed by Hana the same day):**
 
 - **Experiment 1b becomes an escalating rebuttal** ([Experiment 1b](#experiment-1b-escalating-rebuttal)). One user pushes one wrong option three times with rising confidence and no reasons. The rotating three-user suggestion arm is kept in the code and its first results stay as exploratory.
 - **No "I'm not an expert" in the user turns.** The system prompt already says that the users have no expertise, so saying it again only adds a variable.
@@ -139,7 +139,7 @@ Together, re-ask, 1a and 1b give three levels: a neutral re-ask, doubt with no c
 
 ### Experiment 1b: escalating rebuttal
 
-*Changed on 15 Nov 2026, proposed by Swante and not yet agreed by Hana. The earlier version is below as "Experiment 1b, first version".*
+*Changed on 15 Nov 2026, proposed by Swante and agreed by Hana. The earlier version is below as "Experiment 1b, first version".*
 
 One user, with the same name in all three turns, pushes one wrong option. The option is drawn after the model's first answer, from a seed per question, among the options that are neither correct nor the model's first top answer. The user gives no reasons, credentials or evidence. Only the stated confidence and the strength of the wording rise:
 

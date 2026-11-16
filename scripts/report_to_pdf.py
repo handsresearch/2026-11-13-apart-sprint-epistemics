@@ -1,11 +1,17 @@
 """Turn REPORT.md into a PDF for the sprint submission.
 
-Pandoc converts the Markdown to a standalone HTML page with a simple
-paper-like style, and a headless Chrome or Chromium prints that page to PDF.
+Pandoc converts the Markdown to a standalone HTML page laid out like the
+official Apart report template (page size, margins, font, headings), and a
+headless Chrome or Chromium prints that page to PDF. The template's font,
+Old Standard TT, is in docs/fonts/ (SIL Open Font License).
 HTML comments (our TODO notes) are dropped, so they never reach the PDF.
 
 Needs: pandoc, and Chrome or Chromium. No Python packages beyond the standard
-library.
+library. If PyMuPDF is installed (`pip install -e ".[report]"`), the script also
+checks the font size of the finished PDF: Chrome scales the whole page down when
+something is wider than the text area, usually a table, and the PDF then has
+smaller text than the template and too few pages. Check page limits only on a
+PDF that passes this check.
 
     python scripts/report_to_pdf.py                  # REPORT.md -> REPORT.pdf
     python scripts/report_to_pdf.py REPORT.md -o out/report.pdf
@@ -25,34 +31,49 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
+# Layout of the official Apart report template (a Google Doc): US Letter, 1-inch margins, Old Standard TT
+# 11 pt at 1.15 line spacing, bold 14 pt section headings, centred title, authors and "Abstract" heading,
+# and an indented, justified abstract. __FONTS__ is replaced by the URI of docs/fonts/.
 CSS = """
-@page { size: A4; margin: 2.2cm 2.2cm 2.4cm 2.2cm; }
-html { font-size: 10.5pt; }
+@font-face { font-family: "Old Standard TT"; src: url("__FONTS__/OldStandard-Regular.ttf"); }
+@font-face { font-family: "Old Standard TT"; font-style: italic; src: url("__FONTS__/OldStandard-Italic.ttf"); }
+@font-face { font-family: "Old Standard TT"; font-weight: bold; src: url("__FONTS__/OldStandard-Bold.ttf"); }
+@page { size: Letter; margin: 1in; }
+html { font-size: 11pt; }
 body {
-  font-family: "Charter", "Georgia", "Times New Roman", serif;
-  line-height: 1.4; color: #111; max-width: none; margin: 0;
+  font-family: "Old Standard TT", "Georgia", "Times New Roman", serif;
+  line-height: 1.15; color: #000; max-width: none; margin: 0;
 }
-h1, h2, h3, h4 { font-family: "Helvetica Neue", "Arial", sans-serif; line-height: 1.25; break-after: avoid; }
-h1 { font-size: 1.7rem; text-align: center; margin: 0 0 0.8rem; }
-h2 { font-size: 1.25rem; margin: 1.4rem 0 0.5rem; }
-h3 { font-size: 1.08rem; margin: 1.1rem 0 0.4rem; }
-h4 { font-size: 1rem; margin: 0.9rem 0 0.3rem; }
-p { margin: 0.45rem 0; text-align: justify; hyphens: auto; }
-ul, ol { margin: 0.4rem 0; padding-left: 1.4rem; }
-li { margin: 0.15rem 0; }
-table { border-collapse: collapse; width: 100%; margin: 0.8rem 0; font-size: 0.86rem; break-inside: avoid; }
-th, td { border-top: 1px solid #bbb; border-bottom: 1px solid #bbb; padding: 0.25rem 0.4rem; text-align: left; vertical-align: top; }
+h1, h2, h3, h4 { break-after: avoid; font-weight: bold; }
+h1 { font-size: 20pt; line-height: 1.1; text-align: center; text-wrap: balance; margin: 0 0 10pt; }
+h2 { font-size: 14pt; line-height: 1.5; margin: 10pt 0 0; }
+h3 { font-size: 13pt; line-height: 1.3; margin: 10pt 0 2pt; }
+h4 { font-size: 11pt; margin: 8pt 0 2pt; }
+p { margin: 0 0 6pt; }
+.authors p { text-align: center; margin: 0 0 10pt; }
+h2#abstract { text-align: center; margin: 12pt 0 10pt; line-height: 1.15; }
+h2#abstract + p { text-align: justify; margin: 0 0.03in 10pt 0.375in; }
+ul, ol { margin: 0 0 6pt; padding-left: 0.5in; }
+li { margin: 0 0 2pt; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 8pt; font-size: 0.8rem; break-inside: avoid; }
+th, td { border-top: 1px solid #bbb; border-bottom: 1px solid #bbb; padding: 0.15rem 0.3rem; text-align: left; vertical-align: top; }
+td { white-space: nowrap; }  /* numbers with intervals stay on one line; headers may wrap */
+.keep { break-inside: avoid; }  /* a caption stays on the page of its table or figure */
 thead th { border-bottom: 1.5px solid #333; }
-code { font-family: "Menlo", "Consolas", monospace; font-size: 0.88em; }
-pre { background: #f5f5f5; padding: 0.5rem; overflow-x: auto; font-size: 0.82rem; }
+code { font-family: "Menlo", "Consolas", monospace; font-size: 0.8em; }
+pre { background: #f5f5f5; padding: 0.5rem; overflow-x: auto; font-size: 0.8rem; }
 img, figure { max-width: 100%; break-inside: avoid; }
+p > img:only-child { display: block; margin: 6pt auto 3pt; }
 figcaption { font-size: 0.88rem; color: #333; text-align: center; }
-a { color: #1a4fa0; text-decoration: none; }
-blockquote { margin: 0.5rem 1rem; color: #333; }
-.footnotes { font-size: 0.85rem; }
+a { color: #1155cc; text-decoration: none; }
+blockquote { margin: 0 0.3in 6pt; color: #222; }
+.footnotes { font-size: 10pt; }
 """
+
+FONTS = Path(__file__).resolve().parent.parent / "docs" / "fonts"
 
 CHROME_CANDIDATES = [
     "google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "chrome",
@@ -86,6 +107,15 @@ def strip_comments(md: str) -> str:
     return md
 
 
+def keep_captions(html: str) -> str:
+    """Wrap "Table N." caption + table, and image + "Figure N." caption, so each pair stays on one page."""
+    html = re.sub(r"(<p><strong>Table [^<]*</strong>(?:(?!</p>).)*</p>\s*<table.*?</table>)",
+                  r'<div class="keep">\1</div>', html, flags=re.S)
+    html = re.sub(r"(<p><img (?:(?!</p>).)*</p>\s*<p><strong>Figure [^<]*</strong>(?:(?!</p>).)*</p>)",
+                  r'<div class="keep">\1</div>', html, flags=re.S)
+    return html
+
+
 def to_html(md_path: Path, html_path: Path, keep_comments: bool) -> None:
     md = md_path.read_text(encoding="utf-8")
     if not keep_comments:
@@ -94,17 +124,19 @@ def to_html(md_path: Path, html_path: Path, keep_comments: bool) -> None:
     title = title_match.group(1).strip() if title_match else md_path.stem
     with tempfile.TemporaryDirectory() as tmp:
         css_file = Path(tmp) / "report.css"
-        css_file.write_text(CSS, encoding="utf-8")
+        css_file.write_text(CSS.replace("__FONTS__", FONTS.as_uri()), encoding="utf-8")
         src = Path(tmp) / "report.md"
         src.write_text(md, encoding="utf-8")
         subprocess.run(
             ["pandoc", str(src), "--from", "gfm+footnotes", "--to", "html5",
              "--standalone", "--embed-resources", "--css", str(css_file),
              "--metadata", f"pagetitle={title}",
+             "--columns", "10000",  # let the browser size table columns instead of pandoc
              "--resource-path", str(md_path.parent.resolve()),
              "--output", str(html_path)],
             check=True,
         )
+    html_path.write_text(keep_captions(html_path.read_text(encoding="utf-8")), encoding="utf-8")
 
 
 def to_pdf(html_path: Path, pdf_path: Path) -> None:
@@ -123,6 +155,31 @@ def to_pdf(html_path: Path, pdf_path: Path) -> None:
         sys.exit(f"Chrome ran but wrote no PDF ({chrome}).")
 
 
+BODY_PT = 11  # the template's body font size, as set in CSS
+
+
+def warn_if_scaled(pdf_path: Path) -> None:
+    """Warn when the body text of the PDF is not the template's size, i.e. Chrome scaled the page to fit."""
+    try:
+        import pymupdf
+    except ImportError:
+        return
+    sizes: Counter = Counter()
+    with pymupdf.open(pdf_path) as doc:
+        for page in doc:
+            for block in page.get_text("dict")["blocks"]:
+                for line in block.get("lines", []):
+                    for span in line["spans"]:
+                        sizes[round(span["size"], 1)] += len(span["text"])
+    if not sizes:
+        return
+    size = sizes.most_common(1)[0][0]
+    if abs(size - BODY_PT) > 0.3:
+        print(f"WARNING: the body text in {pdf_path} is {size} pt, not {BODY_PT} pt. Chrome scaled the page down "
+              "because something is wider than the text area (usually a table). The page count of this PDF is "
+              "too low; narrow the table and build again.", file=sys.stderr)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("input", nargs="?", default="REPORT.md", type=Path)
@@ -132,7 +189,13 @@ def main() -> None:
     args = ap.parse_args()
 
     if not shutil.which("pandoc"):
-        sys.exit("pandoc is not installed (e.g. `brew install pandoc` or `apt install pandoc`).")
+        # Fall back to the pandoc that the pypandoc-binary package ships (`pip install pypandoc-binary`).
+        try:
+            import pypandoc
+            os.environ["PATH"] = str(Path(pypandoc.get_pandoc_path()).parent) + os.pathsep + os.environ["PATH"]
+        except (ImportError, OSError):
+            sys.exit("pandoc is not installed (e.g. `brew install pandoc`, `apt install pandoc` "
+                     "or `pip install pypandoc-binary`).")
     pdf = args.output or args.input.with_suffix(".pdf")
     pdf.parent.mkdir(parents=True, exist_ok=True)
     html = pdf.with_suffix(".html")
@@ -142,6 +205,7 @@ def main() -> None:
         return
     to_pdf(html, pdf)
     html.unlink()
+    warn_if_scaled(pdf)
     print(f"Wrote {pdf} ({pdf.stat().st_size / 1024:.0f} KB)")
 
 

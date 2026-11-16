@@ -55,6 +55,40 @@ The yardstick is the posterior after all three users. It takes the model's own f
 - **The novice's own turn** moves the probability on the novice's answer by 0.00 to 0.02 for most models, which is close to the warranted 0. Mistral is the exception at about 0.12, and Luna is at 0.05 to 0.08 (counted only when the novice named an option other than the model's current top answer). Luna's large recency effect therefore comes mostly from the student's turn, which pulls it away from the expert, rather than from the novice.
 - **When the expert is wrong** (8 of 100 questions, because the expert is right 95% of the time), Opus shows a recency effect of +0.10 against +0.003 when the expert is right. Eight questions is too few to rely on.
 
+## Reruns of GPT-6 Luna and Mistral Small 4 with model seeds 1 to 3 (15 Nov 2026, exploratory)
+
+**Result: both reruns reproduce the large recency effect, but the logs show two different causes, and the accuracy figures above are not reliable for GPT-6 Luna.** After a novice speaks, GPT-6 Luna writes 25/25/25/25 in about half of its conversations while its reasoning, where a text search can read it, mostly still names the same answer. Where it does not do this, its recency effect is zero. Mistral Small 4's effect remains when such flat answers are left out.
+
+- **Why:** these two models carry the large effects, the main run used model seed 1 for all three repeats, and GPT-6 Luna's first answers looked less accurate here (48%) than in Experiment 1 (68%) on the same questions.
+- **What was run:** the same command as in the main run, as three separate runs per model with `--epochs 1` and `--seed 1`, `2` and `3`. The per-sample cap was $0.01 for GPT-6 Luna and $0.006 for Mistral Small 4. No sample hit a cap.
+
+| Model | Excluded | Expert recency (95% CI) | P(correct): first answer, expert last / expert first (posterior) |
+| --- | --- | --- | --- |
+| GPT-6 Luna | 0 of 300 | +0.284 (+0.234 to +0.333) | 0.50, 0.86 / 0.57 (0.89) |
+| Mistral Small 4 | 50 of 300 | +0.257 (+0.199 to +0.317) | 0.35, 0.56 / 0.31 (0.87) |
+
+**GPT-6 Luna writes down the last speaker's stated accuracy.**
+
+- **Flat answers after the novice:** 164 of 300 answers were 25/25/25/25 after the novice spoke first, and 138 of 300 after the novice spoke last. No answer was flat after the student or the expert.
+- **The reasoning mostly does not change:** a typical flat reply argues that one option is the most likely and then gives 25 to every option. A text search finds an option letter in the reasoning of 86 of the 138 flat final replies. In 72 of them it is the top option one turn earlier, and in 73 it is the final top option of the other ordering. The other 52 flat replies could not be checked this way.
+- **Stated accuracies are copied:** in 40% to 60% of turns, the probability on the speaker's option is exactly that speaker's stated accuracy (95, 75 or 25).
+- **No effect without flat answers:** in the 162 conversations where neither final answer is flat, the recency effect is 0.00, and the final top option is the same in both orderings in 151 of them. The probability on the expert's answer still differs between the orderings there by 0.09 on average, in both directions.
+- **Flat first answers:** 117 of 300 first answers were flat, before any user had spoken. The other 183 were 69% correct, as in Experiment 1.
+
+**Accuracy figures count a flat answer as "A".** A flat answer has no top option, and `top_option` gives ties to the earlier letter. With ties counted this way, the rerun gives 90% accuracy when the expert speaks last and 59% when the expert speaks first. With flat answers left out, it gives 90% and 88%. The accuracies for GPT-6 Luna in the tables above (48%, 87%, 58%) very probably have the same problem; the main-run logs should be checked with the script below. The probability on the correct answer and the recency effect do not depend on the tie rule.
+
+**Mistral Small 4 is a different case.**
+
+- **Fewer flat answers:** 40 of 250 after the novice spoke first, and 63 of 250 after the novice spoke last.
+- **The effect remains without them:** in the 187 conversations where neither final answer is flat, the recency effect is +0.21, and the final top option is the same in both orderings in only 108 of them (104 of 173 without the conversations where two options tie for the top of a final answer).
+- **The answer itself moves:** with flat answers left out, the final answer is correct in 59% of conversations when the expert speaks last and in 37% when the expert speaks first, against 41% at the first answer.
+- **Agreement from the novice lowers the probability:** when the novice named the model's current top answer, the probability on that answer fell by 0.10 (novice speaks first) and 0.19 (novice speaks last).
+
+**This corrects one statement above.** The main-run text says that GPT-6 Luna's effect "comes mostly from the student's turn". In the rerun it comes from flat answers after the novice's turn.
+
+- **Summary data:** `docs/data/exp2-luna-rerun-2026-11-15.json` and `docs/data/exp2-mistral-rerun-2026-11-15.json` (from `python -m fliprate.analyse2`), and `docs/data/exp2-luna-rerun-turns-2026-11-15.json` and `docs/data/exp2-mistral-rerun-turns-2026-11-15.json` (from `python scripts/exp2_speaker_turns.py <logs>`). The logs are in `logs/exp2-luna-rerun/` and `logs/exp2-mistral-rerun/`, which are not in git.
+- **Cost:** $0.66 for GPT-6 Luna and $0.52 for Mistral Small 4 by Inspect's count, plus about $0.01 for a two-question check. The two reruns were expected to cost about $1.20 together, from the main run's costs, so they needed no approval. The hard caps were $3.00 for the first rerun and $1.80 for the second, which started after the first had finished at $0.66.
+
 ## Limits of this result
 
 - **One question set in one field,** MedXpertQA cut to four options, and one wording per user turn. Users give no reasons.

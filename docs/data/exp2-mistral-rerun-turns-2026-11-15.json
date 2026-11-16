@@ -1,0 +1,193 @@
+{
+  "openrouter/mistralai/mistral-small-2603": {
+    "question_repeats": 250,
+    "first_answer": {
+      "accuracy": 0.408,
+      "mean_top_probability": 0.7120804395604395
+    },
+    "flat_answers": {
+      "first_answers": 1,
+      "first_answer_accuracy_without_flat": 0.40963855421686746,
+      "first_answers_not_flat": 249,
+      "after_turn": {
+        "expert_last/novice": 40,
+        "expert_last/student": 2,
+        "expert_last/expert": 0,
+        "expert_first/expert": 0,
+        "expert_first/student": 0,
+        "expert_first/novice": 63
+      },
+      "final": {
+        "expert_last": {
+          "flat": 0,
+          "flat_replies_naming_an_option": 0,
+          "of_which_the_top_option_one_turn_earlier": 0,
+          "of_which_the_professors_option": 0,
+          "accuracy_ties_to_A": 0.588,
+          "accuracy_without_flat": 0.588
+        },
+        "expert_first": {
+          "flat": 63,
+          "flat_replies_naming_an_option": 39,
+          "of_which_the_top_option_one_turn_earlier": 20,
+          "of_which_the_professors_option": 17,
+          "accuracy_ties_to_A": 0.328,
+          "accuracy_without_flat": 0.3689839572192513
+        }
+      },
+      "exactly_stated_record": {
+        "expert_last/novice": 0.212,
+        "expert_last/student": 0.1,
+        "expert_last/expert": 0.2,
+        "expert_first/expert": 0.092,
+        "expert_first/student": 0.132,
+        "expert_first/novice": 0.352
+      },
+      "first_answers_with_top_exactly": {
+        "0.75": 40,
+        "0.95": 4
+      },
+      "order_effect_neither_final_flat": {
+        "mean": 0.21047985404144162,
+        "questions": 90,
+        "question_repeats": 187
+      }
+    },
+    "final_answer_across_orders": {
+      "neither_final_flat": {
+        "question_repeats": 187,
+        "same_final_top_option": 108,
+        "final_answers_with_a_tie_for_the_top": 16,
+        "mean_absolute_difference_on_professors_answer": 0.34899308318595335
+      },
+      "one_final_flat": {
+        "question_repeats": 63,
+        "flat_replies_naming_an_option": 39,
+        "of_which_the_final_top_option_of_the_other_order": 18
+      },
+      "both_finals_flat": 0
+    },
+    "order_effect": {
+      "all": {
+        "mean": 0.2573564694235374,
+        "questions": 99,
+        "question_repeats": 250
+      },
+      "novice_same_as_professor": {
+        "mean": 0.16686547710013788,
+        "questions": 28,
+        "question_repeats": 77
+      },
+      "novice_differs_from_professor": {
+        "mean": 0.29304305794544144,
+        "questions": 71,
+        "question_repeats": 173
+      },
+      "student_same_as_professor": {
+        "mean": 0.2730846035328071,
+        "questions": 64,
+        "question_repeats": 165
+      },
+      "student_differs_from_professor": {
+        "mean": 0.22859645276658713,
+        "questions": 35,
+        "question_repeats": 85
+      },
+      "all_three_same": {
+        "mean": 0.1455324435660025,
+        "questions": 17,
+        "question_repeats": 48
+      },
+      "first_answer_same_as_professor": {
+        "mean": 0.4835941978915641,
+        "questions": 49,
+        "question_repeats": 101
+      },
+      "first_answer_differs_from_professor": {
+        "mean": 0.09177867092614356,
+        "questions": 67,
+        "question_repeats": 149
+      }
+    },
+    "probability_on_professors_answer_by_turn": {
+      "all": {
+        "expert_last": [
+          0.34722681318681314,
+          0.32017768975007604,
+          0.40819051292496245,
+          0.5679228862385073
+        ],
+        "expert_first": [
+          0.34722681318681314,
+          0.5661066688244258,
+          0.4588326980649872,
+          0.3134387290515445
+        ]
+      },
+      "all_three_same": {
+        "expert_last": [
+          0.3677083333333333,
+          0.37451388888888887,
+          0.47085046897546895,
+          0.5327302234533798
+        ],
+        "expert_first": [
+          0.3677083333333333,
+          0.5675,
+          0.5191666666666667,
+          0.3949107142857143
+        ]
+      }
+    },
+    "change_on_speakers_answer_in_own_turn": {
+      "expert_first/expert/names_another_option": {
+        "mean": 0.24103309814719212,
+        "turns": 149
+      },
+      "expert_first/expert/names_current_top": {
+        "mean": 0.18619833946011424,
+        "turns": 101
+      },
+      "expert_first/novice/names_another_option": {
+        "mean": 0.13456862677114392,
+        "turns": 184
+      },
+      "expert_first/novice/names_current_top": {
+        "mean": -0.19021645021645023,
+        "turns": 66
+      },
+      "expert_first/student/names_another_option": {
+        "mean": 0.12136308521725188,
+        "turns": 144
+      },
+      "expert_first/student/names_current_top": {
+        "mean": -0.1229373954247173,
+        "turns": 106
+      },
+      "expert_last/expert/names_another_option": {
+        "mean": 0.18015142470148743,
+        "turns": 132
+      },
+      "expert_last/expert/names_current_top": {
+        "mean": 0.13689072260838883,
+        "turns": 118
+      },
+      "expert_last/novice/names_another_option": {
+        "mean": 0.0850640426849943,
+        "turns": 183
+      },
+      "expert_last/novice/names_current_top": {
+        "mean": -0.10147180996683076,
+        "turns": 67
+      },
+      "expert_last/student/names_another_option": {
+        "mean": 0.12221010053106621,
+        "turns": 177
+      },
+      "expert_last/student/names_current_top": {
+        "mean": 0.09983151631673622,
+        "turns": 73
+      }
+    }
+  }
+}
