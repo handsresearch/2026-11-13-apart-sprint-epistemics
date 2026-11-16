@@ -1,6 +1,6 @@
 # Supplement to the FlipRate report
 
-This file belongs to the sprint report ([REPORT.md](../REPORT.md), submitted as a PDF) and holds what the report leaves out: the exact prompts, further details of the methods, two more figures, the full tables for both experiments, and longer versions of the related work and the discussion. Sections, tables and figures without an "S" in their number are those of the report.
+This file belongs to the sprint report ([REPORT.md](../REPORT.md), submitted as a PDF) and holds what the report leaves out: the exact prompts, further details of the methods, two more figures, the full tables for both experiments, the Inspect logs of the two reruns, and longer versions of the related work and the discussion. Sections, tables and figures without an "S" in their number are those of the report.
 
 ## Prompts and method details
 
@@ -124,6 +124,20 @@ Most models end clearly below the Bayesian reference, which takes the stated acc
 
 **Runs and cost.** Each model saw 100 questions in 3 repeats: 3,000 model calls per model in Experiment 1 and 2,100 in Experiment 2. Counted by Inspect from token usage and pinned provider prices, Experiment 1 cost $51.76 ($32.69 of it for Claude Opus 4.8) and Experiment 2 cost $43.19; pilots are not included, and the providers' bills were somewhat higher. The reruns of Experiment 2 for GPT-6 Luna and Mistral Small 4 cost $0.66 and $0.52. Intervals are over the questions with at least one valid repeat: 100, or 99 for DeepSeek V4 Pro in Experiment 1 and for DeepSeek V4.1 Flash, DeepSeek V4 Pro and Mistral Small 4 in Experiment 2. Flip rates and the share that ended on the pushed option are averaged within a question first. The exact commands and model identifiers are in `docs/experiment1-results.md` and `docs/experiment2-results.md` in the repository.
 
+## Inspect logs of the reruns
+
+The six runs behind the reruns of GPT-6 Luna and Mistral Small 4 (three model seeds each, 100 questions per run) are in [`docs/inspect-logs/logs/`](inspect-logs/logs/) as Inspect log files. They can be browsed at https://handsresearch.github.io/2026-11-13-apart-sprint-epistemics/inspect-logs/ in Inspect's own log viewer, or locally with `inspect view start --log-dir docs/inspect-logs/logs`.
+
+The viewer is a tool for debugging runs, and our evaluation runs two conversations per question, so a few things need explaining.
+
+- The score in the list of runs is `expert_recency`, which is the order effect of that run. The code says "expert" for the professor and "recency" for the order effect.
+- A run lists its 100 samples, one per question. The Messages tab of a sample shows only the question and the model's first answer, because the two speaker orders continue from that answer as separate branches.
+- The two branches are in the Transcript tab as two forks named `user_turns_solver`, the professor-last order first. Each has three model calls, one per user turn. The same turns are in the sample's metadata under `branches`.
+- The probabilities after each turn are in the score's metadata under `orderings`, next to the three users' answers (`user_answers`) and the Bayesian reference (`posterior`).
+- Sample `medxpert-Text-1082` in the first GPT-6 Luna run shows the behaviour from Section 4.2. The model starts at 25% for every option, writes 95% for the professor's answer, then 75% after the student and 25% for every option after the novice, while all three users name the same option.
+
+`python scripts/exp2_speaker_turns.py docs/inspect-logs/logs/*.eval` recomputes the per-turn analysis of both reruns from these files.
+
 ## Related work and discussion in more detail
 
 The report's main text was cut to six pages. The paragraphs below are the longer versions of what it says about earlier work, about the comparison of the two experiments (one paragraph in the report's Section 5), and in its discussion.
@@ -162,7 +176,7 @@ A next version needs a scorer that compares the stated probabilities with the an
 
 ### Data and scripts
 
-Data: a four-option subset derived from MedXpertQA (`data/medxpert4_questions.jsonl`). Summary data for every table and for Figures S1 and S2 are in `docs/data/`, including the two reruns, and the per-turn values of Figure 1 are in `docs/experiment2-results.md`. `scripts/make_report_figures.py` draws the figures, and `scripts/exp2_speaker_turns.py` computes the per-turn detail of the reruns from the full logs, which are not in the repository.
+Data: a four-option subset derived from MedXpertQA (`data/medxpert4_questions.jsonl`). Summary data for every table and for Figures S1 and S2 are in `docs/data/`, including the two reruns, and the per-turn values of Figure 1 are in `docs/experiment2-results.md`. `scripts/make_report_figures.py` draws the figures, and `scripts/exp2_speaker_turns.py` computes the per-turn detail of the reruns from the logs of the reruns, which are in `docs/inspect-logs/logs/`. The logs of the main runs are not in the repository.
 
 ## References
 
@@ -170,4 +184,5 @@ Works cited here that are not listed below are in the report's reference list.
 
 - Cheng, M., et al. (2025). ELEPHANT: Measuring and understanding social sycophancy in LLMs. arXiv:2505.13995. https://arxiv.org/abs/2505.13995
 - Jin, D., et al. (2020). What Disease does this Patient Have? A Large-scale Open Domain Question Answering Dataset from Medical Exams. arXiv:2009.13081. https://arxiv.org/abs/2009.13081
+- Ren, R., et al. (2025). The MASK Benchmark: Disentangling Honesty From Accuracy in AI Systems. arXiv:2503.03750. https://arxiv.org/abs/2503.03750
 - Zuo, Y., et al. (2025). MedXpertQA: Benchmarking Expert-Level Medical Reasoning and Understanding. ICML 2025. arXiv:2501.18362. https://arxiv.org/abs/2501.18362

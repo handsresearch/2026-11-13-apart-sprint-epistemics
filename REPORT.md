@@ -1,4 +1,4 @@
-# FlipRate: Does a Model's Stated Confidence Depend on Who Spoke Last?
+# FlipRate: Language Models Resist Pushback but Not Speaker Order
 
 <!--
 About this draft:
@@ -7,6 +7,7 @@ About this draft:
 - Build the PDF with `python scripts/report_to_pdf.py`. It lays the report out like that template (US Letter, 1-inch
   margins, Old Standard TT 11 pt, the same title block and headings). Figures come from
   `python scripts/make_report_figures.py` (`pip install -e ".[report]"` installs what both need).
+- The repository is public and GitHub Pages serves its docs/ folder (the Inspect log viewer is docs/inspect-logs/).
 - Open points are HTML comments starting with "TODO". They do not appear in the PDF, but resolve them all before submitting.
 - Limits: at most 8 pages without references and appendices (we aim for 4 to 6; the template recommends 4); abstract 150–250 words (the same text goes into the submission form).
 - The main text fills pages 1 to 6 exactly at the template's 11 pt, so a sentence added to it needs a sentence cut. What the cut removed is in docs/report-supplement.md, together with the prompts and the full tables.
@@ -33,11 +34,11 @@ Apart Research
 
 ## Abstract
 
-A chatbot that helps people check their thinking should not change its answer because a user pushed back without a reason, and its stated confidence should not depend on who spoke last. FlipRate tests both on seven models with 100 hard medical multiple-choice questions, recording a probability per option at every turn. In Experiment 1, users without expertise ask "Are you sure?" or push a wrong option with rising confidence. "Are you sure?" shifted every model's probabilities more than a neutral re-ask, but only by 0.03 to 0.09 on a 0–1 scale, and a pushed wrong option became the model's answer in at most 7% of conversations. Experiment 2 tells the model how often each kind of user is right (novices 25%, students 75%, professors 95%). One of each names an answer, the professor last or first. The statements are identical, yet every model put more probability on the professor's answer when the professor spoke last: 0.01 more for Claude Opus 4.8, about 0.3 more for GPT-6 Luna and Mistral Small 4. In reruns, GPT-6 Luna mostly kept arguing for the same answer but often reported the current speaker's stated accuracy as its own probability: 25% for every option after a novice, and in 39% of first answers. Mistral Small 4 ended on different answers. The "Are you sure?" score does not flag GPT-6 Luna, which moved no more than GLM 5.3 Flash (order effect 0.02), while the escalating rebuttal singled out both it and Mistral Small 4.
+A language model asked for a second opinion should change its mind only for a good reason, not because someone disagrees or because of who spoke last. FlipRate has seven models answer 100 medical multiple-choice questions with a probability for every option. Scripted users reply three times, and the model restates its probabilities each time. In Experiment 1, non-expert users give no reasons. "Are you sure?" moved the probabilities only 0.03 to 0.09 (on a 0–1 scale) more than a request to answer again, and models adopted a wrong answer a user pushed in at most 7% of conversations. In Experiment 2 a novice, a student and a professor of known accuracy each name an answer. With the same statements, every model put more probability on the professor's answer when the professor spoke last instead of first, from 0.01 for Claude Opus 4.8 to about 0.3 for GPT-6 Luna and Mistral Small 4. In reruns, Mistral Small 4 often ended on a different answer. GPT-6 Luna mostly argued for the same answer, but the probabilities it wrote often repeated the last speaker's stated accuracy. The takeaway is that stated confidence can reflect who spoke last and not the model's reasoning, even in a model that withstands "Are you sure?". Anyone relying on it should test speaker order and check the numbers against the answer the model argues for.
 
 ## 1. Introduction
 
-People increasingly ask chatbots for a second opinion, for instance on a diagnosis. That is only useful if the answer depends on the evidence, and we look at two ways in which the social situation can decide it instead. In the first, a user without expertise says "Are you sure?" or insists on a different answer without offering a reason, and the model changes its mind. In the second, people of different reliability each give their view, and what the model ends up saying depends on the order in which they spoke.
+People increasingly ask language models for a second opinion, for instance on a diagnosis. That is only useful if the answer depends on the evidence, and we look at two ways in which the social situation can decide it instead. In the first, a user without expertise says "Are you sure?" or insists on a different answer without offering a reason, and the model changes its mind. In the second, people of different reliability each give their view, and what the model ends up saying depends on the order in which they spoke.
 
 FlipRate measures both with the same instrument. A model answers a hard four-option medical question and gives a probability for every option, then scripted users write three turns and the model restates its probabilities after each one. We ran two experiments on seven current models from five developers, under the sprint's Track 1 (model epistemics evaluations). Our main contributions are:
 
@@ -49,7 +50,9 @@ FlipRate measures both with the same instrument. A model answers a hard four-opt
 
 <!-- Every claim in this section was checked against the full text of the papers on 15 Nov 2026. "No re-ask control" (FlipFlop, SycEval) is an absence finding from reading the full text. Re-check any sentence you change. -->
 
-Sharma et al. (2023) showed early that assistants often change their answer when a user replies "I don't think that's right. Are you sure?" The closest study to our Experiment 1 is FlipFlop (Laban et al., 2023). There, a model answers a classification question and a challenger replies with something like "Are you sure?". Across ten models, answers flipped 46% of the time on average. FlipFlop challenges once and has no neutral re-ask, and its challengers dispute the answer but never propose another. We push three times, record a probability for every option instead of only the chosen answer, and add both a re-ask and a user who names a specific wrong answer. SycEval (Fanous et al., 2025) tests rebuttals of rising strength, also without a re-ask control. Its stronger rebuttals carry content, including a proposed answer that is the correct one whenever the model started out wrong, so giving in can be reasonable, whereas our escalation gives no reasons. MASK (Ren et al., 2025) checks what a model believes with repeated and related questions. We do not run such a check, so a shift in stated probabilities need not be a change in belief (Appendix A). Models use information best when it sits at the start or the end of a long input (Liu et al., 2023), and Weng et al. (2025) study how models conform to the answers of other agents. Our Experiment 2 tells the model how accurate each speaker is, so we know that the same statements in a different order should lead to the same final answer.
+Sharma et al. (2023) showed early that assistants often change their answer when a user replies "I don't think that's right. Are you sure?" The closest study to our Experiment 1 is FlipFlop (Laban et al., 2023), in which a model answers a classification question and a challenger replies with something like "Are you sure?". Across ten models, answers flipped 46% of the time on average. FlipFlop challenges once, and its challengers dispute the answer but never propose another. SycEval (Fanous et al., 2025) tests rebuttals of rising strength. Its stronger rebuttals carry content, including a proposed answer that is the correct one whenever the model started out wrong, so giving in can be reasonable. Both score only the answer and neither has a re-ask control, so they cannot say how much a model would have moved anyway, and they miss a model whose confidence erodes while its answer stays. Experiment 1 addresses this gap. We push three times without reasons, in one condition with a specific wrong answer, record a probability for every option, and compare each kind of pressure with a neutral re-ask.
+
+Models use information best when it sits at the start or the end of a long input (Liu et al., 2023), and Weng et al. (2025) study how models conform to the answers of other agents. For the order of speakers, neither provides a setting in which the right amount of movement is known. Our Experiment 2 tells the model how accurate each speaker is, so we know that the same statements in a different order should lead to the same final answer. FlipRate is the test to use when one needs to know how much of a model's movement the pressure causes and whether its stated confidence survives a change in the order of speakers.
 
 ## 3. Methods
 
@@ -137,8 +140,8 @@ Pressure without reasons moved six of the seven models we tested only slightly, 
 
 ## Code and Data
 
-- Code repository: https://github.com/handsresearch/2026-11-13-apart-sprint-epistemics <!-- TODO (authors): make it public before submitting. The report points to the supplement in the repository for the prompts, the full tables and two figures, so readers cannot see them otherwise. -->
-- Data: a four-option subset derived from MedXpertQA (`data/medxpert4_questions.jsonl`), with summary data in `docs/data/`. The full logs are not in the repository. The supplement (`docs/report-supplement.md`) has the exact prompts, further details of the methods and results, Figures S1 and S2, and Tables S1 and S2.
+- Code repository: https://github.com/handsresearch/2026-11-13-apart-sprint-epistemics
+- Data: a four-option subset derived from MedXpertQA (`data/medxpert4_questions.jsonl`), with summary data in `docs/data/`. The Inspect logs of the two reruns can be browsed at https://handsresearch.github.io/2026-11-13-apart-sprint-epistemics/inspect-logs/. The supplement (`docs/report-supplement.md`) has the exact prompts, further details of the methods and results, Figures S1 and S2, and Tables S1 and S2.
 - All FlipRate code and every experiment were written during the sprint. A scaffold for a different, dropped idea predates it (12 Nov 2026, up to commit `8cda680`; Appendix B).
 
 ## Author Contributions
@@ -151,11 +154,10 @@ S.S. proposed the FlipRate design and its second version, estimated model costs,
 1. Fanous, A., et al. (2025). SycEval: Evaluating LLM Sycophancy. AIES 2025. arXiv:2502.08177. https://arxiv.org/abs/2502.08177
 2. Laban, P., et al. (2023). Are You Sure? Challenging LLMs Leads to Performance Drops in The FlipFlop Experiment. arXiv:2311.08596. https://arxiv.org/abs/2311.08596
 3. Liu, N. F., et al. (2023). Lost in the Middle: How Language Models Use Long Contexts. Transactions of the Association for Computational Linguistics. arXiv:2307.03172. https://arxiv.org/abs/2307.03172
-4. Ren, R., et al. (2025). The MASK Benchmark: Disentangling Honesty From Accuracy in AI Systems. arXiv:2503.03750. https://arxiv.org/abs/2503.03750
-5. Sharma, M., et al. (2023). Towards Understanding Sycophancy in Language Models. arXiv:2310.13548. https://arxiv.org/abs/2310.13548
-6. UK AI Security Institute (2024). Inspect AI: Framework for Large Language Model Evaluations. Software. https://github.com/UKGovernmentBEIS/inspect_ai
-7. Weng, Z., et al. (2025). Do as We Do, Not as You Think: the Conformity of Large Language Models. ICLR 2025. arXiv:2501.13381. https://arxiv.org/abs/2501.13381
-8. Zuo, Y., et al. (2025). MedXpertQA: Benchmarking Expert-Level Medical Reasoning and Understanding. ICML 2025. arXiv:2501.18362. https://arxiv.org/abs/2501.18362
+4. Sharma, M., et al. (2023). Towards Understanding Sycophancy in Language Models. arXiv:2310.13548. https://arxiv.org/abs/2310.13548
+5. UK AI Security Institute (2024). Inspect AI: Framework for Large Language Model Evaluations. Software. https://github.com/UKGovernmentBEIS/inspect_ai
+6. Weng, Z., et al. (2025). Do as We Do, Not as You Think: the Conformity of Large Language Models. ICLR 2025. arXiv:2501.13381. https://arxiv.org/abs/2501.13381
+7. Zuo, Y., et al. (2025). MedXpertQA: Benchmarking Expert-Level Medical Reasoning and Understanding. ICML 2025. arXiv:2501.18362. https://arxiv.org/abs/2501.18362
 
 ## Appendix A. Limitations and Dual-Use / Ethical Considerations
 
