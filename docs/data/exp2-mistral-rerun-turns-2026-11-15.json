@@ -53,6 +53,20 @@
         "question_repeats": 187
       }
     },
+    "final_answer_across_orders": {
+      "neither_final_flat": {
+        "question_repeats": 187,
+        "same_final_top_option": 108,
+        "final_answers_with_a_tie_for_the_top": 16,
+        "mean_absolute_difference_on_professors_answer": 0.34899308318595335
+      },
+      "one_final_flat": {
+        "question_repeats": 63,
+        "flat_replies_naming_an_option": 39,
+        "of_which_the_final_top_option_of_the_other_order": 18
+      },
+      "both_finals_flat": 0
+    },
     "order_effect": {
       "all": {
         "mean": 0.2573564694235374,

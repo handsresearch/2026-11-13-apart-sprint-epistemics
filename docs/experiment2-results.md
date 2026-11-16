@@ -57,7 +57,7 @@ The yardstick is the posterior after all three users. It takes the model's own f
 
 ## Reruns of GPT-6 Luna and Mistral Small 4 with model seeds 1 to 3 (15 Nov 2026, exploratory)
 
-**Result: both reruns reproduce the large recency effect, but the logs show two different causes, and the accuracy figures above are not reliable for GPT-6 Luna.** After a novice speaks, GPT-6 Luna writes 25/25/25/25 in about half of its conversations while its reasoning still names the same answer. Where it does not do this, its recency effect is zero. Mistral Small 4's effect remains when such flat answers are left out.
+**Result: both reruns reproduce the large recency effect, but the logs show two different causes, and the accuracy figures above are not reliable for GPT-6 Luna.** After a novice speaks, GPT-6 Luna writes 25/25/25/25 in about half of its conversations while its reasoning, where a text search can read it, mostly still names the same answer. Where it does not do this, its recency effect is zero. Mistral Small 4's effect remains when such flat answers are left out.
 
 - **Why:** these two models carry the large effects, the main run used model seed 1 for all three repeats, and GPT-6 Luna's first answers looked less accurate here (48%) than in Experiment 1 (68%) on the same questions.
 - **What was run:** the same command as in the main run, as three separate runs per model with `--epochs 1` and `--seed 1`, `2` and `3`. The per-sample cap was $0.01 for GPT-6 Luna and $0.006 for Mistral Small 4. No sample hit a cap.
@@ -70,9 +70,9 @@ The yardstick is the posterior after all three users. It takes the model's own f
 **GPT-6 Luna writes down the last speaker's stated accuracy.**
 
 - **Flat answers after the novice:** 164 of 300 answers were 25/25/25/25 after the novice spoke first, and 138 of 300 after the novice spoke last. No answer was flat after the student or the expert.
-- **The reasoning does not change:** a typical flat reply argues that one option is the most likely and then gives 25 to every option.
+- **The reasoning mostly does not change:** a typical flat reply argues that one option is the most likely and then gives 25 to every option. A text search finds an option letter in the reasoning of 86 of the 138 flat final replies. In 72 of them it is the top option one turn earlier, and in 73 it is the final top option of the other ordering. The other 52 flat replies could not be checked this way.
 - **Stated accuracies are copied:** in 40% to 60% of turns, the probability on the speaker's option is exactly that speaker's stated accuracy (95, 75 or 25).
-- **No effect without flat answers:** in the 162 conversations where neither final answer is flat, the recency effect is 0.00.
+- **No effect without flat answers:** in the 162 conversations where neither final answer is flat, the recency effect is 0.00, and the final top option is the same in both orderings in 151 of them. The probability on the expert's answer still differs between the orderings there by 0.09 on average, in both directions.
 - **Flat first answers:** 117 of 300 first answers were flat, before any user had spoken. The other 183 were 69% correct, as in Experiment 1.
 
 **Accuracy figures count a flat answer as "A".** A flat answer has no top option, and `top_option` gives ties to the earlier letter. With ties counted this way, the rerun gives 90% accuracy when the expert speaks last and 59% when the expert speaks first. With flat answers left out, it gives 90% and 88%. The accuracies for GPT-6 Luna in the tables above (48%, 87%, 58%) very probably have the same problem; the main-run logs should be checked with the script below. The probability on the correct answer and the recency effect do not depend on the tie rule.
@@ -80,7 +80,7 @@ The yardstick is the posterior after all three users. It takes the model's own f
 **Mistral Small 4 is a different case.**
 
 - **Fewer flat answers:** 40 of 250 after the novice spoke first, and 63 of 250 after the novice spoke last.
-- **The effect remains without them:** in the 187 conversations where neither final answer is flat, the recency effect is +0.21.
+- **The effect remains without them:** in the 187 conversations where neither final answer is flat, the recency effect is +0.21, and the final top option is the same in both orderings in only 108 of them (104 of 173 without the conversations where two options tie for the top of a final answer).
 - **The answer itself moves:** with flat answers left out, the final answer is correct in 59% of conversations when the expert speaks last and in 37% when the expert speaks first, against 41% at the first answer.
 - **Agreement from the novice lowers the probability:** when the novice named the model's current top answer, the probability on that answer fell by 0.10 (novice speaks first) and 0.19 (novice speaks last).
 
