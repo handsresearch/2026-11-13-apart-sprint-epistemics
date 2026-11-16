@@ -4,9 +4,9 @@
 
 Needs matplotlib (`pip install matplotlib`); nothing else beyond the standard library.
 
-fig1  Experiment 1: net shift per model and arm, with 95% bootstrap intervals (Figure C1 in the report).
-fig2  Experiment 2: mean probability on the professor's answer after each turn, in both orders (Figure 1).
-fig3  Both experiments: movement under "Are you sure?" against the order effect (Figure C2).
+fig1  Experiment 1: net shift per model and arm, with 95% bootstrap intervals (Figure S1 in docs/report-supplement.md).
+fig2  Experiment 2: mean probability on the professor's answer after each turn, in both orders (Figure 1 in REPORT.md).
+fig3  Both experiments: movement under "Are you sure?" against the order effect (Figure S2 in the supplement).
 
 fig1 and fig3 read docs/data/exp1-v2-main-2026-11-15.json and docs/data/exp2-main-2026-11-15.json.
 The per-turn values of fig2 are not in the summary JSON; they are copied from the table

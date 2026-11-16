@@ -2,6 +2,7 @@
 
 A two-person entry for the Apart Research **AI x Epistemics Research Sprint**, held online Fri 13 – Sun 15 Nov 2026.
 
+- [REPORT.md](REPORT.md): the sprint report. [docs/report-supplement.md](docs/report-supplement.md) has what the report leaves out: the exact prompts, further method details, two more figures and the full tables.
 - [RESEARCH_PLAN.md](RESEARCH_PLAN.md): our FlipRate experiment design (version 3, proposed), with a narrow core study for the deadline.
 - [OLD_RESEARCH_PLAN.md](OLD_RESEARCH_PLAN.md): version 2 of the design, kept unchanged.
 - [SPRINT.md](SPRINT.md): what the sprint is, its tracks, the deadline, what to submit and how it is judged.

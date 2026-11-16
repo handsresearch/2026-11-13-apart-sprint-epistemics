@@ -7,7 +7,11 @@ Old Standard TT, is in docs/fonts/ (SIL Open Font License).
 HTML comments (our TODO notes) are dropped, so they never reach the PDF.
 
 Needs: pandoc, and Chrome or Chromium. No Python packages beyond the standard
-library.
+library. If PyMuPDF is installed (`pip install -e ".[report]"`), the script also
+checks the font size of the finished PDF: Chrome scales the whole page down when
+something is wider than the text area, usually a table, and the PDF then has
+smaller text than the template and too few pages. Check page limits only on a
+PDF that passes this check.
 
     python scripts/report_to_pdf.py                  # REPORT.md -> REPORT.pdf
     python scripts/report_to_pdf.py REPORT.md -o out/report.pdf
@@ -27,6 +31,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 # Layout of the official Apart report template (a Google Doc): US Letter, 1-inch margins, Old Standard TT
@@ -150,6 +155,31 @@ def to_pdf(html_path: Path, pdf_path: Path) -> None:
         sys.exit(f"Chrome ran but wrote no PDF ({chrome}).")
 
 
+BODY_PT = 11  # the template's body font size, as set in CSS
+
+
+def warn_if_scaled(pdf_path: Path) -> None:
+    """Warn when the body text of the PDF is not the template's size, i.e. Chrome scaled the page to fit."""
+    try:
+        import pymupdf
+    except ImportError:
+        return
+    sizes: Counter = Counter()
+    with pymupdf.open(pdf_path) as doc:
+        for page in doc:
+            for block in page.get_text("dict")["blocks"]:
+                for line in block.get("lines", []):
+                    for span in line["spans"]:
+                        sizes[round(span["size"], 1)] += len(span["text"])
+    if not sizes:
+        return
+    size = sizes.most_common(1)[0][0]
+    if abs(size - BODY_PT) > 0.3:
+        print(f"WARNING: the body text in {pdf_path} is {size} pt, not {BODY_PT} pt. Chrome scaled the page down "
+              "because something is wider than the text area (usually a table). The page count of this PDF is "
+              "too low; narrow the table and build again.", file=sys.stderr)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("input", nargs="?", default="REPORT.md", type=Path)
@@ -175,6 +205,7 @@ def main() -> None:
         return
     to_pdf(html, pdf)
     html.unlink()
+    warn_if_scaled(pdf)
     print(f"Wrote {pdf} ({pdf.stat().st_size / 1024:.0f} KB)")
 
 
