@@ -1,6 +1,8 @@
 .env
 logs/
 logs-*/
+# the published Inspect log viewer keeps its logs in the repo (see docs/report-supplement.md)
+!docs/inspect-logs/logs/
 __pycache__/
 *.egg-info/
 .venv/

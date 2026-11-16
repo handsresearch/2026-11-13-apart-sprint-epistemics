@@ -1,0 +1,110 @@
+{
+  "2026-11-15T21-26-50-00-00_experiment2_eEYyaearSs2fZY5tk8CR2h.eval": {
+    "eval_id": "ArdzFuV2sciaKi9PT4xeD9",
+    "run_id": "7iCEvQhLKQFAL7cvDyRN65",
+    "task": "experiment2",
+    "task_id": "eEYyaearSs2fZY5tk8CR2h",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/mistralai/mistral-small-2603",
+    "started_at": "2026-11-15T21:26:50+00:00",
+    "completed_at": "2026-11-15T21:28:15+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.24583767112422775,
+      "params": {}
+    }
+  },
+  "2026-11-15T21-26-50-00-00_experiment2_UjwWxjitMjcvP2ahWUdmia.eval": {
+    "eval_id": "8xk5e5qBNGYsXQacYfUFR6",
+    "run_id": "Ba6MCQbKwfeFdFMqSJsQeW",
+    "task": "experiment2",
+    "task_id": "UjwWxjitMjcvP2ahWUdmia",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/mistralai/mistral-small-2603",
+    "started_at": "2026-11-15T21:26:50+00:00",
+    "completed_at": "2026-11-15T21:28:17+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.27291432394251836,
+      "params": {}
+    }
+  },
+  "2026-11-15T21-26-50-00-00_experiment2_8sDfVbG3WU3V5kSiDfqq9o.eval": {
+    "eval_id": "5Mqkq4uDBjZakzmWQKrGyp",
+    "run_id": "oN9hUx4MpiXhwsD8yBT8wA",
+    "task": "experiment2",
+    "task_id": "8sDfVbG3WU3V5kSiDfqq9o",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/mistralai/mistral-small-2603",
+    "started_at": "2026-11-15T21:26:50+00:00",
+    "completed_at": "2026-11-15T21:28:23+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.24514750623697995,
+      "params": {}
+    }
+  },
+  "2026-11-15T21-05-38-00-00_experiment2_nj2wmVMtgZRVybv9Fq6Z4G.eval": {
+    "eval_id": "E8Z56tcAbzvo5kCjo82pHT",
+    "run_id": "e99fvwng4824v3jUPKVNe4",
+    "task": "experiment2",
+    "task_id": "nj2wmVMtgZRVybv9Fq6Z4G",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/openai/gpt-6-luna",
+    "started_at": "2026-11-15T21:05:38+00:00",
+    "completed_at": "2026-11-15T21:07:13+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.3154,
+      "params": {}
+    }
+  },
+  "2026-11-15T21-05-38-00-00_experiment2_MH9yKzAnZWbJprvgoniDWd.eval": {
+    "eval_id": "QRE3CwGfLozoPbRMxGU8LQ",
+    "run_id": "GRFTYdqBP824bwY2moxtcw",
+    "task": "experiment2",
+    "task_id": "MH9yKzAnZWbJprvgoniDWd",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/openai/gpt-6-luna",
+    "started_at": "2026-11-15T21:05:38+00:00",
+    "completed_at": "2026-11-15T21:07:15+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.254,
+      "params": {}
+    }
+  },
+  "2026-11-15T21-05-38-00-00_experiment2_AvFkThv3AaAKEqcsQBcXgw.eval": {
+    "eval_id": "i5dyvFPCMMprBZsicjAqqn",
+    "run_id": "ENNr72Vyam3k5QxY35X575",
+    "task": "experiment2",
+    "task_id": "AvFkThv3AaAKEqcsQBcXgw",
+    "task_version": 0,
+    "version": 2,
+    "status": "success",
+    "invalidated": false,
+    "model": "openrouter/openai/gpt-6-luna",
+    "started_at": "2026-11-15T21:05:38+00:00",
+    "completed_at": "2026-11-15T21:07:12+00:00",
+    "primary_metric": {
+      "name": "mean_valid",
+      "value": 0.28119999999999995,
+      "params": {}
+    }
+  }
+}
