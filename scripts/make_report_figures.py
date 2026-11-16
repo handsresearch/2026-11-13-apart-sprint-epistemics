@@ -4,12 +4,12 @@
 
 Needs matplotlib (`pip install matplotlib`); nothing else beyond the standard library.
 
-Figure 1  Experiment 1: net shift per model and arm, with 95% bootstrap intervals.
-Figure 2  Experiment 2: mean probability on the professor's answer after each turn, in both orders.
-Figure 3  Both experiments: movement under "Are you sure?" against the order effect.
+fig1  Experiment 1: net shift per model and arm, with 95% bootstrap intervals (Figure C1 in the report).
+fig2  Experiment 2: mean probability on the professor's answer after each turn, in both orders (Figure 1).
+fig3  Both experiments: movement under "Are you sure?" against the order effect (Figure C2).
 
-Figures 1 and 3 read docs/data/exp1-v2-main-2026-11-15.json and docs/data/exp2-main-2026-11-15.json.
-The per-turn values of Figure 2 are not in the summary JSON; they are copied from the table
+fig1 and fig3 read docs/data/exp1-v2-main-2026-11-15.json and docs/data/exp2-main-2026-11-15.json.
+The per-turn values of fig2 are not in the summary JSON; they are copied from the table
 "mean probability on the expert's answer after each turn" in docs/experiment2-results.md.
 """
 
@@ -43,7 +43,7 @@ MODELS = [
 GREY, BLUE, ORANGE = "#8a8984", "#2a78d6", "#eb6834"
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 
-# Figure 2: mean probability on the expert's answer after turns 0-3 (docs/experiment2-results.md).
+# fig2: mean probability on the expert's answer after turns 0-3 (docs/experiment2-results.md).
 TRAJECTORIES = {
     "Claude Opus 4.8": {"expert_last": [0.54, 0.52, 0.60, 0.88], "expert_first": [0.54, 0.84, 0.87, 0.87]},
     "Mistral Small 4": {"expert_last": [0.37, 0.33, 0.42, 0.62], "expert_first": [0.37, 0.61, 0.51, 0.33]},

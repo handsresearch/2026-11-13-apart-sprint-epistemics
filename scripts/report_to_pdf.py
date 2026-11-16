@@ -43,7 +43,7 @@ body {
   line-height: 1.15; color: #000; max-width: none; margin: 0;
 }
 h1, h2, h3, h4 { break-after: avoid; font-weight: bold; }
-h1 { font-size: 20pt; line-height: 1.1; text-align: center; margin: 0 0 10pt; }
+h1 { font-size: 20pt; line-height: 1.1; text-align: center; text-wrap: balance; margin: 0 0 10pt; }
 h2 { font-size: 14pt; line-height: 1.5; margin: 10pt 0 0; }
 h3 { font-size: 13pt; line-height: 1.3; margin: 10pt 0 2pt; }
 h4 { font-size: 11pt; margin: 8pt 0 2pt; }
